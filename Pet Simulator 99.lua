@@ -260,7 +260,7 @@ local UltimateToggle = MainTab:CreateToggle({
                         warn("Ultimate activated!")
                     end
                 end
-                task.wait()
+                task.wait(2)
             end
         end)
     end,
