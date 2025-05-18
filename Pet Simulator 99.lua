@@ -279,7 +279,7 @@ local DaycareToggle = MainTab:CreateToggle({
                     task.wait(1)
                     local args = {
                         [1] = {
-                            ["6d9ae73648cf4160a5d8ee216929b5e5"] = 54
+                            ["6d9ae73648cf4160a5d8ee216929b5e5"] = 55
                         }
                     }
                     game:GetService("ReplicatedStorage").Network:FindFirstChild("Daycare: Enroll"):InvokeServer(unpack(args))
