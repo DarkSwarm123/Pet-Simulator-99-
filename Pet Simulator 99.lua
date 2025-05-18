@@ -240,7 +240,7 @@ local SeedBagToggle = GardenTab:CreateToggle({
     end
 })
 
-
+local UltimateCmds = require(game:GetService("ReplicatedStorage").Library.Client.UltimateCmds)
 
 local toggleEnabled = false
 
@@ -252,11 +252,15 @@ local UltimateToggle = MainTab:CreateToggle({
 
         task.spawn(function()
             while toggleEnabled do
-                local args = {
-                    [1] = "Pet Surge"
-                }
-                game:GetService("ReplicatedStorage").Network:FindFirstChild("Ultimates: Activate"):InvokeServer(unpack(args))
-                task.wait(4)
+                local equipped = UltimateCmds.GetEquippedItem()
+
+                if equipped and UltimateCmds.IsCharged(equipped:GetId()) then
+                    local success = UltimateCmds.Activate(equipped:GetId())
+                    if success then
+                        warn("Ultimate activated!")
+                    end
+                end
+                task.wait()
             end
         end)
     end,
