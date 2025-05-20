@@ -271,25 +271,46 @@ local DaycareToggle = MainTab:CreateToggle({
     CurrentValue = false,
     Flag = "AutoDaycare",
     Callback = function(Value)
-        getgenv().AutoDaycare = Value
+        local AutoDaycare = Value
+
         task.spawn(function()
-            while getgenv().AutoDaycare do
+            local ReplicatedStorage = game:GetService("ReplicatedStorage")
+            local Network = ReplicatedStorage.Network
+            local DaycareCmds = require(ReplicatedStorage.Library.Client.DaycareCmds)
+            local Save = require(ReplicatedStorage.Library.Client.Save)
+
+            while AutoDaycare do
                 pcall(function()
-                    game:GetService("ReplicatedStorage").Network:FindFirstChild("Daycare: Claim"):InvokeServer()
-                    task.wait(1)
-                    local args = {
-                        [1] = {
-                            ["1512825f06e94d76b169f4abace033f4"] = 55
+                    local active = Save.Get().DaycareActive or {}
+                    local readyToClaim = false
+
+                    for uuid, _ in pairs(active) do
+                        if DaycareCmds.ComputeRemainingTime(uuid) <= 0 then
+                            readyToClaim = true
+                            break
+                        end
+                    end
+
+                    if readyToClaim then
+                        Network["Daycare: Claim"]:InvokeServer()
+                        task.wait(1)
+
+                        local maxSlots = DaycareCmds.GetMaxSlots()
+
+                        local args = {
+                            [1] = {
+                                ["1512825f06e94d76b169f4abace033f4"] = maxSlots
+                            }
                         }
-                    }
-                    game:GetService("ReplicatedStorage").Network:FindFirstChild("Daycare: Enroll"):InvokeServer(unpack(args))
+
+                        Network["Daycare: Enroll"]:InvokeServer(unpack(args))
+                    end
                 end)
-                task.wait(30) -- przerwa między cyklami, możesz zmienić
+                task.wait(30)
             end
         end)
     end,
 })
-
 -- Zmienna sterująca Auto Fuse
 local autoFuseEnabled = false
 local autoFuseRunning = false  
