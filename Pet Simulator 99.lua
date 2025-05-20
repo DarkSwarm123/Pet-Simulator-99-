@@ -266,13 +266,14 @@ local UltimateToggle = MainTab:CreateToggle({
     end,
 })
 
+local AutoDaycare = false
+
 local DaycareToggle = MainTab:CreateToggle({
     Name = "Auto Daycare",
     CurrentValue = false,
     Flag = "AutoDaycare",
     Callback = function(Value)
-        local AutoDaycare = Value
-
+        AutoDaycare = Value
         task.spawn(function()
             local ReplicatedStorage = game:GetService("ReplicatedStorage")
             local Network = ReplicatedStorage.Network
@@ -291,7 +292,8 @@ local DaycareToggle = MainTab:CreateToggle({
                         end
                     end
 
-                    if readyToClaim then
+                    -- Jeśli są gotowe do odebrania LUB nie ma żadnych w Daycare
+                    if readyToClaim or next(active) == nil then
                         Network["Daycare: Claim"]:InvokeServer()
                         task.wait(1)
 
@@ -306,11 +308,12 @@ local DaycareToggle = MainTab:CreateToggle({
                         Network["Daycare: Enroll"]:InvokeServer(unpack(args))
                     end
                 end)
-                task.wait(30)
+                task.wait()
             end
         end)
     end,
 })
+
 -- Zmienna sterująca Auto Fuse
 local autoFuseEnabled = false
 local autoFuseRunning = false  
