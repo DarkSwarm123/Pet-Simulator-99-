@@ -245,7 +245,7 @@ local UltimateCmds = require(game:GetService("ReplicatedStorage").Library.Client
 local toggleEnabled = false
 
 local UltimateToggle = MainTab:CreateToggle({
-    Name = "Auto Pet Surge Ultimate",
+    Name = "Auto Ultimate",
     CurrentValue = false,
     Callback = function(Value)
         toggleEnabled = Value
