@@ -241,6 +241,7 @@ local SeedBagToggle = GardenTab:CreateToggle({
 })
 
 local UltimateCmds = require(game:GetService("ReplicatedStorage").Library.Client.UltimateCmds)
+local MapCmds = require(game:GetService("ReplicatedStorage").Library.Client.MapCmds)
 
 local toggleEnabled = false
 
@@ -252,15 +253,17 @@ local UltimateToggle = MainTab:CreateToggle({
 
         task.spawn(function()
             while toggleEnabled do
-                local equipped = UltimateCmds.GetEquippedItem()
+                if MapCmds.IsInDottedBox() then
+                    local equipped = UltimateCmds.GetEquippedItem()
 
-                if equipped and UltimateCmds.IsCharged(equipped:GetId()) then
-                    local success = UltimateCmds.Activate(equipped:GetId())
-                    if success then
-                        warn("Ultimate activated!")
+                    if equipped and UltimateCmds.IsCharged(equipped:GetId()) then
+                        local success = UltimateCmds.Activate(equipped:GetId())
+                        if success then
+                            warn("Ultimate activated!")
+                        end
                     end
                 end
-                task.wait(2)
+                task.wait()
             end
         end)
     end,
