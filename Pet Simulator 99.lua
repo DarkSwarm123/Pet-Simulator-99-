@@ -21,6 +21,9 @@ local MainTab = Window:CreateTab("Main", 4483362458)
 local OtherTab = Window:CreateTab("Other", 4483362458)
 local GardenTab = Window:CreateTab("Garden", 15555104643)
 
+local orb = require(game:GetService("ReplicatedStorage").Library.Client.OrbCmds.Orb)
+orb.CollectDistance = math.huge
+
 local function Wait(x)
     local startTick = tick()  -- Czas rzeczywisty
     local startClock = os.clock()  -- Czas CPU
