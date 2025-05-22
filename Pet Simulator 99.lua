@@ -394,20 +394,8 @@ local RemoteSpyButton = OtherTab:CreateButton({
     end
 })
 
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Network = ReplicatedStorage:WaitForChild("Network")
-local UpdateTimer = Network:WaitForChild("Idle Tracking: Update Timer")
-local StopTimer = Network:WaitForChild("Idle Tracking: Stop Timer")
-
-local function sendStopTimer()
-    ReplicatedStorage.Network:FindFirstChild("Idle Tracking: Stop Timer"):FireServer()
-    print("Wysłano Stop Timer.")
-end
-
-task.spawn(function()
-    while true do
-        local waitTime = math.random(180, 420)
-        task.wait(waitTime)  -- Czekaj losowy czas
-        sendStopTimer()  -- Wyślij "Stop Timer"
-    end
+game:GetService("Players").LocalPlayer.Idled:Connect(function()
+    local VIM = game:GetService("VirtualInputManager")
+    VIM:SendMouseButtonEvent(0, 0, 0, true, game, 0)
+    VIM:SendMouseButtonEvent(0, 0, 0, false, game, 0)
 end)
