@@ -394,6 +394,9 @@ local RemoteSpyButton = OtherTab:CreateButton({
     end
 })
 
+local scriptPath = game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.Core["Idle Tracking"]
+scriptPath:Destroy()
+
 game:GetService("Players").LocalPlayer.Idled:Connect(function()
     local VIM = game:GetService("VirtualInputManager")
     VIM:SendMouseButtonEvent(0, 0, 0, true, game, 0)
