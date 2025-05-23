@@ -253,9 +253,9 @@ local function getCharmAmounts()
     local filtered = {}
     local total = 0
 
-    for _, item in pairs(inventory["Charm"] or {}) do
-        if item.id and charmIDs[item.id] and item._am and item._am >= 1 then
-            filtered[item.id] = item._am
+    for itemID, item in pairs(inventory["Charm"] or {}) do
+        if charmIDs[itemID] and item._am and item._am >= 1 then
+            filtered[itemID] = item._am
             total += item._am
         end
     end
