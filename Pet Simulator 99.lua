@@ -235,12 +235,16 @@ local SeedBagToggle = GardenTab:CreateToggle({
 })
 
 local openSizes = {100, 50, 25, 10, 10, 5, 1}
-local function createAutoOpenToggle(itemName, flag)
+local bagToggles = {} -- dla ewentualnego dostępu do wszystkich później
+
+local function createAutoOpenToggleVar(itemName)
+    local toggleVarName = itemName:gsub(" ", "") .. "Toggle"
     local state = false
-    ItemsTab:CreateToggle({
+
+    _G[toggleVarName] = ItemsTab:CreateToggle({
         Name = "Auto Open " .. itemName,
         CurrentValue = false,
-        Flag = flag,
+        Flag = "Open" .. itemName:gsub(" ", ""),
         Callback = function(Value)
             state = Value
             if state then
@@ -264,20 +268,18 @@ local function createAutoOpenToggle(itemName, flag)
             end
         end
     })
+
+    bagToggles[toggleVarName] = _G[toggleVarName]
 end
 
--- Lista worków
+-- Lista tylko zwykłych bagów (bez "Large")
 local bagNames = {
-    "Charm Stone", "Gift Bag", "Large Gift Bag", "Toy Bag", "Large Toy Bag",
-    "Potion Bag", "Large Potion Bag",
-    "Fruit Bag", "Large Fruit Bag",
-    "Flag Bag", "Large Flag Bag"
+    "Gift Bag", "Toy Bag", "Potion Bag", "Fruit Bag", "Flag Bag"
 }
 
--- Tworzenie toggle’ów
+-- Tworzenie toggle’i
 for _, name in ipairs(bagNames) do
-    local flag = "Open" .. name:gsub(" ", "")
-    createAutoOpenToggle(name, flag)
+    createAutoOpenToggleVar(name)
 end
 
 local UltimateCmds = require(game:GetService("ReplicatedStorage").Library.Client.UltimateCmds)
