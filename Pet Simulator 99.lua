@@ -235,6 +235,57 @@ local SeedBagToggle = GardenTab:CreateToggle({
     end
 })
 
+local CharmToggleEnabled = false
+local function getTotalAmount(section)
+    local inventory = Save.Get().Inventory
+    local total = 0
+    local amountsTable = {}
+
+    if not inventory[section] then return 0, {} end
+
+    for _, item in pairs(inventory[section]) do
+        if item._am then
+            total = total + item._am
+            amountsTable[item.id] = item._am
+        end
+    end
+
+    return total, amountsTable
+end
+
+local CharmtoConvertToggle = ItemsTab:CreateToggle({
+    Name = "Convert Charms to Charm Stone",
+    CurrentValue = false,
+    Flag = "CharmToggle",
+    Callback = function(Value)
+        CharmToggleEnabled = Value
+        if CharmToggleEnabled then
+            task.spawn(function()
+                while CharmToggleEnabled do
+                    local totalAmount, amounts = getTotalAmount("Charm")
+                    if totalAmount >= 100 then
+                        local args = {
+                            [1] = "Charm Stone",
+                            [2] = {
+                                ["9e0a0e96c54f429fb0690a5fbc3de0f9"] = amounts["9e0a0e96c54f429fb0690a5fbc3de0f9"] or 0,
+                                ["7d4572b565c74b84b443dd917a6cbe09"] = amounts["7d4572b565c74b84b443dd917a6cbe09"] or 0,
+                                ["bb45969a0da34d3cac910ff615c57f4f"] = amounts["bb45969a0da34d3cac910ff615c57f4f"] or 0,
+                                ["126d8cebb2484ce8bf5a7a8e91e8a1bc"] = amounts["126d8cebb2484ce8bf5a7a8e91e8a1bc"] or 0,
+                                ["b875cb62f17b445b802b22ac3e60458a"] = amounts["b875cb62f17b445b802b22ac3e60458a"] or 0,
+                                ["b664e4ab4e2744bc9bf60c08f37e63ac"] = amounts["b664e4ab4e2744bc9bf60c08f37e63ac"] or 0,
+                                ["df4e5e5b83634497a9552676126c1a0a"] = amounts["df4e5e5b83634497a9552676126c1a0a"] or 0,
+                                ["1a69cc2eda5845059002642190d1a504"] = amounts["1a69cc2eda5845059002642190d1a504"] or 0,
+                            }
+                        }
+                        game:GetService("ReplicatedStorage").Network.ForgeMachine_Activate:InvokeServer(unpack(args))
+                    else
+                        task.wait(1)
+                    end
+                end
+            end)
+        end
+    end
+})
 local CharmStoneOpen = false
 local OpenCharmStoneToggle = ItemsTab:CreateToggle({
     Name = "Auto Open Charm Stone",
