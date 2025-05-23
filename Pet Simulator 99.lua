@@ -257,28 +257,27 @@ CharmStoneOpen = Value
     end
 })
 
-local SeedBagOpen = false
-local OpenSeedBagToggle = ItemsTab:CreateToggle({
-    Name = "Auto Open Seed Bag",
+local GiftBagOpen = false
+local OpenGiftBagToggle = ItemsTab:CreateToggle({
+    Name = "Auto Open Gift Bag",
     CurrentValue = false,
-    Flag = "OpenSeedBagToggle",
+    Flag = "OpenGiftBagToggle",
     Callback = function(Value)
-        SeedBagOpen = Value
-        if SeedBagOpen then
+        GiftBagOpen = Value
+        if GiftBagOpen then
             task.spawn(function()
-                while SeedBagOpen do
-                    local amount = getAmount("Misc", "Seed Bag")
+                while GiftBagOpen do
+                    local amount = getAmount("Misc", "Gift Bag")
                     local openSizes = {100, 50, 25, 10, 10, 5, 1}
 
                     for _, size in ipairs(openSizes) do
-                        while amount >= size and SeedBagOpen do
+                        while amount >= size and GiftBagOpen do
                             local args = {
-                                [1] = "Seed Bag",
+                                [1] = "Gift Bag",
                                 [2] = size
                             }
                             game:GetService("ReplicatedStorage").Network.GiftBag_Open:InvokeServer(unpack(args))
-                            amount -= size
-                            task.wait(0.1)
+                            amount -= size                            
                         end
                     end
 
