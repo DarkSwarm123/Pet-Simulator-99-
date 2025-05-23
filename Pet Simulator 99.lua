@@ -211,15 +211,6 @@ local GardenCycleToggle = GardenTab:CreateToggle({
     end
 })
 
-local function getGift(id)
-    local inventory = Save.Get().Inventory
-    for i, v in pairs(inventory.Misc) do
-        if v.id == id then
-            return i, v
-        end
-    end
-end
-
 local SeedBagEnabled = false
 
 local SeedBagToggle = GardenTab:CreateToggle({
@@ -231,8 +222,8 @@ local SeedBagToggle = GardenTab:CreateToggle({
         if SeedBagEnabled then
             task.spawn(function()
                 while SeedBagEnabled do
-                    local Id, GID = getGift("Seed Bag")
-                    if Id and GID then
+                    local amount = getAmount("Misc", "Seed Bag")
+                    if amount >= 1 then
                         game:GetService("ReplicatedStorage").Network.GiftBag_Open:InvokeServer("Seed Bag")
                     else
                         task.wait(1)
