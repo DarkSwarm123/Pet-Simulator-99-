@@ -238,29 +238,29 @@ local SeedBagToggle = GardenTab:CreateToggle({
 local CharmToggleEnabled = false
 
 local charmIDs = {
-    "9e0a0e96c54f429fb0690a5fbc3de0f9",
-    "7d4572b565c74b84b443dd917a6cbe09",
-    "bb45969a0da34d3cac910ff615c57f4f",
-    "126d8cebb2484ce8bf5a7a8e91e8a1bc",
-    "b875cb62f17b445b802b22ac3e60458a",
-    "b664e4ab4e2744bc9bf60c08f37e63ac",
-    "df4e5e5b83634497a9552676126c1a0a",
-    "1a69cc2eda5845059002642190d1a504"
+    ["9e0a0e96c54f429fb0690a5fbc3de0f9"] = true,
+    ["7d4572b565c74b84b443dd917a6cbe09"] = true,
+    ["bb45969a0da34d3cac910ff615c57f4f"] = true,
+    ["126d8cebb2484ce8bf5a7a8e91e8a1bc"] = true,
+    ["b875cb62f17b445b802b22ac3e60458a"] = true,
+    ["b664e4ab4e2744bc9bf60c08f37e63ac"] = true,
+    ["df4e5e5b83634497a9552676126c1a0a"] = true,
+    ["1a69cc2eda5845059002642190d1a504"] = true
 }
 
-local function getTotalAmount(section)
+local function getCharmAmounts()
     local inventory = Save.Get().Inventory
-    local amountsTable = {}
+    local filtered = {}
+    local total = 0
 
-    if not inventory[section] then return 0, {} end
-
-    for _, item in pairs(inventory[section]) do
-        if item._am then
-            amountsTable[item.id] = item._am
+    for _, item in pairs(inventory["Charm"] or {}) do
+        if item.id and charmIDs[item.id] and item._am and item._am >= 1 then
+            filtered[item.id] = item._am
+            total += item._am
         end
     end
 
-    return amountsTable
+    return total, filtered
 end
 
 local CharmtoConvertToggle = ItemsTab:CreateToggle({
@@ -272,25 +272,16 @@ local CharmtoConvertToggle = ItemsTab:CreateToggle({
         if CharmToggleEnabled then
             task.spawn(function()
                 while CharmToggleEnabled do
-                    local amounts = getTotalAmount("Charm")
-                    local totalAmount = 0
-                    local filteredAmounts = {}
-
-                    for _, id in ipairs(charmIDs) do
-                        local amt = amounts[id] or 0
-                        if amt > 0 then
-                            filteredAmounts[id] = amt
-                            totalAmount = totalAmount + amt
-                        end
-                    end
-
-                    if totalAmount >= 100 then
+                    local total, filtered = getCharmAmounts()
+                    if total >= 100 then
+                        print("Wysyłam:", filtered)
                         local args = {
                             [1] = "Charm Stone",
-                            [2] = filteredAmounts
+                            [2] = filtered
                         }
                         game:GetService("ReplicatedStorage").Network.ForgeMachine_Activate:InvokeServer(unpack(args))
                     else
+                        print("Za mało Charmów, tylko:", total)
                         task.wait(1)
                     end
                 end
