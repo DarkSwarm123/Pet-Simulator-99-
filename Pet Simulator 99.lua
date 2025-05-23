@@ -19,6 +19,7 @@ local Window = Rayfield:CreateWindow({
 
 local MainTab = Window:CreateTab("Main", 4483362458)
 local OtherTab = Window:CreateTab("Other", 4483362458)
+local ItemsTab = Window:CreateTab("Items", 4483362458)
 local GardenTab = Window:CreateTab("Garden", 15555104643)
 
 local orb = require(game:GetService("ReplicatedStorage").Library.Client.OrbCmds.Orb)
@@ -225,6 +226,26 @@ local SeedBagToggle = GardenTab:CreateToggle({
                     local amount = getAmount("Misc", "Seed Bag")
                     if amount >= 1 then
                         game:GetService("ReplicatedStorage").Network.GiftBag_Open:InvokeServer("Seed Bag")
+                    else
+                        task.wait(1)
+                    end
+                end
+            end)
+        end
+    end
+})
+
+local OpenCharmStoneToggle = ItemsTab:CreateToggle({
+    Name = "Auto Open Charm Stone",
+    CurrentValue = false,
+    Flag = "OpenCharmStoneToggle",
+    Callback = function(value)
+        if value then
+            task.spawn(function()
+                while OpenCharmStoneToggle.CurrentValue do
+                    local amount = getAmount("Misc", "Charm Stone")
+                    if amount >= 1 then
+                        game:GetService("ReplicatedStorage").Network.GiftBag_Open:InvokeServer("Charm Stone")
                     else
                         task.wait(1)
                     end
