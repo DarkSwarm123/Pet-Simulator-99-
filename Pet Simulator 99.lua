@@ -237,7 +237,7 @@ local SeedBagToggle = GardenTab:CreateToggle({
 
 local CharmToggleEnabled = false
 
-local charmIDs = {
+local allowedCharmIDs = {
     ["9e0a0e96c54f429fb0690a5fbc3de0f9"] = true,
     ["7d4572b565c74b84b443dd917a6cbe09"] = true,
     ["bb45969a0da34d3cac910ff615c57f4f"] = true,
@@ -245,22 +245,25 @@ local charmIDs = {
     ["b875cb62f17b445b802b22ac3e60458a"] = true,
     ["b664e4ab4e2744bc9bf60c08f37e63ac"] = true,
     ["df4e5e5b83634497a9552676126c1a0a"] = true,
-    ["1a69cc2eda5845059002642190d1a504"] = true
+    ["1a69cc2eda5845059002642190d1a504"] = true,
 }
 
-local function getCharmAmounts()
+local function getFilteredCharms()
     local inventory = Save.Get().Inventory
-    local filtered = {}
+    local section = inventory and inventory["Charm"]
     local total = 0
+    local result = {}
 
-    for itemID, item in pairs(inventory["Charm"] or {}) do
-        if charmIDs[itemID] and item._am and item._am >= 1 then
-            filtered[itemID] = item._am
-            total += item._am
+    if not section then return 0, {} end
+
+    for charmID, charm in pairs(section) do
+        if allowedCharmIDs[charmID] and charm._am and charm._am > 0 then
+            result[charmID] = charm._am
+            total = total + charm._am
         end
     end
 
-    return total, filtered
+    return total, result
 end
 
 local CharmtoConvertToggle = ItemsTab:CreateToggle({
@@ -272,18 +275,15 @@ local CharmtoConvertToggle = ItemsTab:CreateToggle({
         if CharmToggleEnabled then
             task.spawn(function()
                 while CharmToggleEnabled do
-                    local total, filtered = getCharmAmounts()
+                    local total, charmData = getFilteredCharms()
                     if total >= 100 then
-                        print("Wysyłam:", filtered)
                         local args = {
                             [1] = "Charm Stone",
-                            [2] = filtered
+                            [2] = charmData
                         }
                         game:GetService("ReplicatedStorage").Network.ForgeMachine_Activate:InvokeServer(unpack(args))
-                    else
-                        print("Za mało Charmów, tylko:", total)
-                        task.wait(1)
                     end
+                    task.wait(1)
                 end
             end)
         end
