@@ -235,61 +235,6 @@ local SeedBagToggle = GardenTab:CreateToggle({
     end
 })
 
-local CharmToggleEnabled = false
-
-local allowedCharmIDs = {
-    ["9e0a0e96c54f429fb0690a5fbc3de0f9"] = true,
-    ["7d4572b565c74b84b443dd917a6cbe09"] = true,
-    ["bb45969a0da34d3cac910ff615c57f4f"] = true,
-    ["126d8cebb2484ce8bf5a7a8e91e8a1bc"] = true,
-    ["b875cb62f17b445b802b22ac3e60458a"] = true,
-    ["b664e4ab4e2744bc9bf60c08f37e63ac"] = true,
-    ["df4e5e5b83634497a9552676126c1a0a"] = true,
-    ["1a69cc2eda5845059002642190d1a504"] = true,
-}
-
-local function getFilteredCharms()
-    local inventory = Save.Get().Inventory
-    local section = inventory and inventory["Charm"]
-    local total = 0
-    local result = {}
-
-    if not section then return 0, {} end
-
-    for charmID, charm in pairs(section) do
-        if allowedCharmIDs[charmID] and charm._am and charm._am > 0 then
-            result[charmID] = charm._am
-            total = total + charm._am
-        end
-    end
-
-    return total, result
-end
-
-local CharmtoConvertToggle = ItemsTab:CreateToggle({
-    Name = "Convert Charms to Charm Stone",
-    CurrentValue = false,
-    Flag = "CharmToggle",
-    Callback = function(Value)
-        CharmToggleEnabled = Value
-        if CharmToggleEnabled then
-            task.spawn(function()
-                while CharmToggleEnabled do
-                    local total, charmData = getFilteredCharms()
-                    if total >= 100 then
-                        local args = {
-                            [1] = "Charm Stone",
-                            [2] = charmData
-                        }
-                        game:GetService("ReplicatedStorage").Network.ForgeMachine_Activate:InvokeServer(unpack(args))
-                    end
-                    task.wait(1)
-                end
-            end)
-        end
-    end
-})
-
 local CharmStoneOpen = false
 local OpenCharmStoneToggle = ItemsTab:CreateToggle({
     Name = "Auto Open Charm Stone",
