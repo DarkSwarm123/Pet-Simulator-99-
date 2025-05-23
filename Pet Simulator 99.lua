@@ -235,17 +235,19 @@ local SeedBagToggle = GardenTab:CreateToggle({
     end
 })
 
+local CharmStoneOpen = false
 local OpenCharmStoneToggle = ItemsTab:CreateToggle({
     Name = "Auto Open Charm Stone",
     CurrentValue = false,
     Flag = "OpenCharmStoneToggle",
-    Callback = function(value)
-        if value then
+    Callback = function(Value)
+CharmStoneOpen = Value
+        if CharmStoneOpen then
             task.spawn(function()
-                while OpenCharmStoneToggle.CurrentValue do
+                while CharmStoneOpen do
                     local amount = getAmount("Misc", "Charm Stone")
-                    if amount >= 1 then
-                        game:GetService("ReplicatedStorage").Network.GiftBag_Open:InvokeServer("Charm Stone")
+
+                    if amount >= 1 then                        game:GetService("ReplicatedStorage").Network.GiftBag_Open:InvokeServer("Charm Stone")
                     else
                         task.wait(1)
                     end
