@@ -169,7 +169,7 @@ local function gardenCycle()
                     local args = {"FlowerGarden", "PlantSeed", i, "Diamond"}
                     game:GetService("ReplicatedStorage").Network.Instancing_InvokeCustomFromClient:InvokeServer(unpack(args))
                 end)
-                Wait(3)
+                Wait(2)
             end
 
             for i = 1, 10 do
@@ -177,7 +177,7 @@ local function gardenCycle()
                     local args = {"FlowerGarden", "InstaGrowSeed", i}
                     game:GetService("ReplicatedStorage").Network.Instancing_InvokeCustomFromClient:InvokeServer(unpack(args))
                 end)
-                Wait(3)
+                Wait(2)
             end
 
             for i = 1, 10 do
@@ -185,7 +185,7 @@ local function gardenCycle()
                     local args = {"FlowerGarden", "ClaimPlant", i}
                     game:GetService("ReplicatedStorage").Network.Instancing_FireCustomFromClient:FireServer(unpack(args))
                 end)
-                Wait(3)
+                Wait(2)
             end
         else
             task.wait() 
@@ -205,7 +205,7 @@ local GardenCycleToggle = GardenTab:CreateToggle({
                     local args1 = {"FlowerGarden", "ClaimPlant", i}
                     game:GetService("ReplicatedStorage").Network.Instancing_FireCustomFromClient:FireServer(unpack(args1))
                 end)
-                task.wait(0.1)
+                task.wait()
             end
             task.spawn(gardenCycle)
         end
@@ -278,7 +278,7 @@ local UltimateToggle = MainTab:CreateToggle({
                         end
                     end
                 end
-                task.wait()
+                task.wait(1)
             end
         end)
     end,
@@ -326,7 +326,7 @@ local DaycareToggle = MainTab:CreateToggle({
                         Network["Daycare: Enroll"]:InvokeServer(unpack(args))
                     end
                 end)
-                task.wait()
+                task.wait(1)
             end
         end)
     end,
