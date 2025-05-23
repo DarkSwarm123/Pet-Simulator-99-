@@ -288,6 +288,37 @@ local OpenGiftBagToggle = ItemsTab:CreateToggle({
     end
 })
 
+local LargeGiftBagOpen = false
+local OpenLargeGiftBagToggle = ItemsTab:CreateToggle({
+    Name = "Auto Open Large Gift Bag",
+    CurrentValue = false,
+    Flag = "OpenLargeGiftBagToggle",
+    Callback = function(Value)
+        LargeGiftBagOpen = Value
+        if LargeGiftBagOpen then
+            task.spawn(function()
+                while LargeGiftBagOpen do
+                    local amount = getAmount("Misc", "Large Gift Bag")
+                    local openSizes = {100, 50, 25, 10, 10, 5, 1}
+
+                    for _, size in ipairs(openSizes) do
+                        while amount >= size and LargeGiftBagOpen do
+                            local args = {
+                                [1] = "Large Gift Bag",
+                                [2] = size
+                            }
+                            game:GetService("ReplicatedStorage").Network.GiftBag_Open:InvokeServer(unpack(args))
+                            amount -= size                           
+                        end
+                    end
+
+                    task.wait(1)
+                end
+            end)
+        end
+    end
+})
+
 local UltimateCmds = require(game:GetService("ReplicatedStorage").Library.Client.UltimateCmds)
 local MapCmds = require(game:GetService("ReplicatedStorage").Library.Client.MapCmds)
 
