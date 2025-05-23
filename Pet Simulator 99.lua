@@ -234,53 +234,89 @@ local SeedBagToggle = GardenTab:CreateToggle({
     end
 })
 
-local openSizes = {100, 50, 25, 10, 10, 5, 1}
-local bagToggles = {} -- dla ewentualnego dostępu do wszystkich później
-
-local function createAutoOpenToggleVar(itemName)
-    local toggleVarName = itemName:gsub(" ", "") .. "Toggle"
-    local state = false
-
-    _G[toggleVarName] = ItemsTab:CreateToggle({
-        Name = "Auto Open " .. itemName,
-        CurrentValue = false,
-        Flag = "Open" .. itemName:gsub(" ", ""),
-        Callback = function(Value)
-            state = Value
-            if state then
-                task.spawn(function()
-                    while state do
-                        local amount = getAmount("Misc", itemName)
-                        for _, size in ipairs(openSizes) do
-                            while amount >= size and state do
-                                local args = {
-                                    [1] = itemName,
-                                    [2] = size
-                                }
-                                game:GetService("ReplicatedStorage").Network.GiftBag_Open:InvokeServer(unpack(args))
-                                amount -= size
-                                task.wait(0.1)
-                            end
-                        end
+local CharmStoneOpen = false
+local OpenCharmStoneToggle = ItemsTab:CreateToggle({
+    Name = "Open Charm Stone",
+    CurrentValue = false,
+    Flag = "OpenCharmStoneToggle",
+    Callback = function(Value)
+CharmStoneOpen = Value
+        if CharmStoneOpen then
+            task.spawn(function()
+                while CharmStoneOpen do
+                    local amount = getAmount("Misc", "Charm Stone")
+                    if amount >= 1 then
+                        game:GetService("ReplicatedStorage").Network.GiftBag_Open:InvokeServer("Charm Stone")
+                    else
                         task.wait(1)
                     end
-                end)
-            end
+                end
+            end)
         end
-    })
+    end
+})
 
-    bagToggles[toggleVarName] = _G[toggleVarName]
-end
+local GiftBagOpen = false
+local OpenGiftBagToggle = ItemsTab:CreateToggle({
+    Name = "Auto Open Gift Bag",
+    CurrentValue = false,
+    Flag = "OpenGiftBagToggle",
+    Callback = function(Value)
+        GiftBagOpen = Value
+        if GiftBagOpen then
+            task.spawn(function()
+                while GiftBagOpen do
+                    local amount = getAmount("Misc", "Gift Bag")
+                    local openSizes = {100, 50, 25, 10, 10, 5, 1}
 
--- Lista tylko zwykłych bagów (bez "Large")
-local bagNames = {
-    "Gift Bag", "Toy Bag", "Potion Bag", "Fruit Bag", "Flag Bag"
-}
+                    for _, size in ipairs(openSizes) do
+                        while amount >= size and GiftBagOpen do
+                            local args = {
+                                [1] = "Gift Bag",
+                                [2] = size
+                            }
+                            game:GetService("ReplicatedStorage").Network.GiftBag_Open:InvokeServer(unpack(args))
+                            amount -= size                            
+                        end
+                    end
 
--- Tworzenie toggle’i
-for _, name in ipairs(bagNames) do
-    createAutoOpenToggleVar(name)
-end
+                    task.wait(1)
+                end
+            end)
+        end
+    end
+})
+
+local LargeGiftBagOpen = false
+local OpenLargeGiftBagToggle = ItemsTab:CreateToggle({
+    Name = "Auto Open Large Gift Bag",
+    CurrentValue = false,
+    Flag = "OpenLargeGiftBagToggle",
+    Callback = function(Value)
+        LargeGiftBagOpen = Value
+        if LargeGiftBagOpen then
+            task.spawn(function()
+                while LargeGiftBagOpen do
+                    local amount = getAmount("Misc", "Large Gift Bag")
+                    local openSizes = {100, 50, 25, 10, 10, 5, 1}
+
+                    for _, size in ipairs(openSizes) do
+                        while amount >= size and LargeGiftBagOpen do
+                            local args = {
+                                [1] = "Large Gift Bag",
+                                [2] = size
+                            }
+                            game:GetService("ReplicatedStorage").Network.GiftBag_Open:InvokeServer(unpack(args))
+                            amount -= size                            
+                        end
+                    end
+
+                    task.wait(1)
+                end
+            end)
+        end
+    end
+})
 
 local UltimateCmds = require(game:GetService("ReplicatedStorage").Library.Client.UltimateCmds)
 local MapCmds = require(game:GetService("ReplicatedStorage").Library.Client.MapCmds)
