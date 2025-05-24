@@ -318,6 +318,46 @@ local OpenLargeGiftBagToggle = ItemsTab:CreateToggle({
     end
 })
 
+local openStates = {}
+local openToggles = {}
+
+local openSizes = {100, 50, 25, 10, 10, 5, 1}
+local bagNames = {
+    "Charm Stone", "Gift Bag", "Flag Bundle", "Potion Bundle"
+}
+
+for _, name in ipairs(bagNames) do
+    local varName = name:gsub(" ", "")
+    openStates[varName] = false
+
+    openToggles[varName] = ItemsTab:CreateToggle({
+        Name = "Auto Open " .. name,
+        CurrentValue = false,
+        Flag = "Open" .. varName .. "Toggle",
+        Callback = function(Value)
+            openStates[varName] = Value
+            if Value then
+                task.spawn(function()
+                    while openStates[varName] do
+                        local amount = getAmount("Misc", name)
+                        for _, size in ipairs(openSizes) do
+                            while amount >= size and openStates[varName] do
+                                local args = {
+                                    [1] = name,
+                                    [2] = size
+                                }
+                                game:GetService("ReplicatedStorage").Network.GiftBag_Open:InvokeServer(unpack(args))
+                                amount -= size
+                            end
+                        end
+                        task.wait(1)
+                    end
+                end)
+            end
+        end
+    })
+end
+
 local UltimateCmds = require(game:GetService("ReplicatedStorage").Library.Client.UltimateCmds)
 local MapCmds = require(game:GetService("ReplicatedStorage").Library.Client.MapCmds)
 
