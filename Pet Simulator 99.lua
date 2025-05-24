@@ -256,6 +256,8 @@ CharmStoneOpen = Value
     end
 })
 
+local openSizes = {100, 50, 25, 10, 10, 5, 1}
+
 local GiftBagOpen = false
 local OpenGiftBagToggle = ItemsTab:CreateToggle({
     Name = "Auto Open Gift Bag",
@@ -266,8 +268,7 @@ local OpenGiftBagToggle = ItemsTab:CreateToggle({
         if GiftBagOpen then
             task.spawn(function()
                 while GiftBagOpen do
-                    local amount = getAmount("Misc", "Gift Bag")
-                    local openSizes = {100, 50, 25, 10, 10, 5, 1}
+                    local amount = getAmount("Misc", "Gift Bag")                    
 
                     for _, size in ipairs(openSizes) do
                         while amount >= size and GiftBagOpen do
@@ -297,8 +298,7 @@ local OpenLargeGiftBagToggle = ItemsTab:CreateToggle({
         if LargeGiftBagOpen then
             task.spawn(function()
                 while LargeGiftBagOpen do
-                    local amount = getAmount("Misc", "Large Gift Bag")
-                    local openSizes = {100, 50, 25, 10, 10, 5, 1}
+                    local amount = getAmount("Misc", "Large Gift Bag")                    
 
                     for _, size in ipairs(openSizes) do
                         while amount >= size and LargeGiftBagOpen do
