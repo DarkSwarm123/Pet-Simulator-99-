@@ -258,72 +258,12 @@ CharmStoneOpen = Value
 
 local openSizes = {100, 50, 25, 10, 10, 5, 1}
 
-local GiftBagOpen = false
-local OpenGiftBagToggle = ItemsTab:CreateToggle({
-    Name = "Auto Open Gift Bag",
-    CurrentValue = false,
-    Flag = "OpenGiftBagToggle",
-    Callback = function(Value)
-        GiftBagOpen = Value
-        if GiftBagOpen then
-            task.spawn(function()
-                while GiftBagOpen do
-                    local amount = getAmount("Misc", "Gift Bag")                    
-
-                    for _, size in ipairs(openSizes) do
-                        while amount >= size and GiftBagOpen do
-                            local args = {
-                                [1] = "Gift Bag",
-                                [2] = size
-                            }
-                            game:GetService("ReplicatedStorage").Network.GiftBag_Open:InvokeServer(unpack(args))
-                            amount -= size                            
-                        end
-                    end
-
-                    task.wait(1)
-                end
-            end)
-        end
-    end
-})
-
-local LargeGiftBagOpen = false
-local OpenLargeGiftBagToggle = ItemsTab:CreateToggle({
-    Name = "Auto Open Large Gift Bag",
-    CurrentValue = false,
-    Flag = "OpenLargeGiftBagToggle",
-    Callback = function(Value)
-        LargeGiftBagOpen = Value
-        if LargeGiftBagOpen then
-            task.spawn(function()
-                while LargeGiftBagOpen do
-                    local amount = getAmount("Misc", "Large Gift Bag")                    
-
-                    for _, size in ipairs(openSizes) do
-                        while amount >= size and LargeGiftBagOpen do
-                            local args = {
-                                [1] = "Large Gift Bag",
-                                [2] = size
-                            }
-                            game:GetService("ReplicatedStorage").Network.GiftBag_Open:InvokeServer(unpack(args))
-                            amount -= size                            
-                        end
-                    end
-
-                    task.wait(1)
-                end
-            end)
-        end
-    end
-})
-
 local openStates = {}
 local openToggles = {}
 
 local openSizes = {100, 50, 25, 10, 10, 5, 1}
 local bagNames = {
-    "Charm Stone", "Gift Bag", "Flag Bundle", "Potion Bundle"
+    "Gift Bag", "Large Gift Bag", "Flag Bundle", "Enchant Bundle", "Large Enchant Bundle", "Potion Bundle", "Large Potion Bundle"
 }
 
 for _, name in ipairs(bagNames) do
