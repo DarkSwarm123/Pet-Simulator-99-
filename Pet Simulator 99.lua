@@ -152,7 +152,7 @@ local function getAmount(section, id)
     local inventory = Save.Get().Inventory
     for _, v in pairs(inventory[section]) do
         if v.id == id then
-            return v._am or 0
+            return v._am or 1
         end
     end
     return 0
