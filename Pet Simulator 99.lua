@@ -360,7 +360,7 @@ local DaycareToggle = MainTab:CreateToggle({
 
                         local args = {
                             [1] = {
-                                ["4edda4a6332c41c1ae4ee194be3e4fff"] = maxSlots
+                                ["834e287ab0b94368a8173fad05ddd320"] = maxSlots
                             }
                         }
 
