@@ -21,6 +21,7 @@ local MainTab = Window:CreateTab("Main", 4483362458)
 local OtherTab = Window:CreateTab("Other", 4483362458)
 local ItemsTab = Window:CreateTab("Items", 4483362458)
 local GardenTab = Window:CreateTab("Garden", 15555104643)
+local MinigamesTab = Window:CreateTab("Minigames", 4483362458)
 
 local orb = require(game:GetService("ReplicatedStorage").Library.Client.OrbCmds.Orb)
 orb.CollectDistance = math.huge
@@ -445,6 +446,37 @@ local RemoteSpyButton = OtherTab:CreateButton({
     Callback = function()
         loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Simple-Spy-32021"))()
     end
+})
+
+local Section = MinigamesTab:CreateSection("Fishing")
+
+local advancedFishingEnabled = false
+
+YourTab:CreateToggle({
+    Name = "Auto Advanced Fishing",
+    CurrentValue = false,
+    Flag = "AutoFishing",
+    Callback = function(Value)
+        advancedFishingEnabled = Value
+
+        task.spawn(function()
+            while advancedFishingEnabled do
+                -- RequestCast (rzut wędką)
+                local pos = Vector3.new(1468.33, 61.62, -4449.37)
+                game:GetService("ReplicatedStorage").Network.Instancing_InvokeCustomFromClient:InvokeServer("AdvancedFishing", "RequestCast", pos)
+
+                task.wait(0.25)
+
+                -- Symulacja klikania i zwijania przez 5 cykli
+                for i = 1, 5 do
+                    if not advancedFishingEnabled then break end
+                    game:GetService("ReplicatedStorage").Network.Instancing_InvokeCustomFromClient:InvokeServer("AdvancedFishing", "Clicked")
+                    game:GetService("ReplicatedStorage").Network.Instancing_FireCustomFromClient:FireServer("AdvancedFishing", "RequestReel")
+                    task.wait(0.35)
+                end
+            end
+        end)
+    end,
 })
 
 local scriptPath = game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.Core["Idle Tracking"]
