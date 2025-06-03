@@ -448,10 +448,7 @@ local RemoteSpyButton = OtherTab:CreateButton({
     end
 })
 
-local Section = MinigamesTab:CreateSection("Fishing")
-
 local advancedFishingEnabled = false
-
 local AdvancedFishingToggle = MinigamesTab:CreateToggle({
     Name = "Auto Advanced Fishing",
     CurrentValue = false,
