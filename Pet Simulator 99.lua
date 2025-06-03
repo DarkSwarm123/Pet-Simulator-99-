@@ -462,14 +462,14 @@ local AdvancedFishingToggle = MinigamesTab:CreateToggle({
                 local pos = Vector3.new(1468.33, 61.62, -4449.37)
                 game:GetService("ReplicatedStorage").Network.Instancing_InvokeCustomFromClient:InvokeServer("AdvancedFishing", "RequestCast", pos)
 
-                task.wait(0.25)
+                task.wait()
 
                 -- Symulacja klikania i zwijania przez 5 cykli
                 for i = 1, 5 do
                     if not advancedFishingEnabled then break end
                     game:GetService("ReplicatedStorage").Network.Instancing_InvokeCustomFromClient:InvokeServer("AdvancedFishing", "Clicked")
                     game:GetService("ReplicatedStorage").Network.Instancing_FireCustomFromClient:FireServer("AdvancedFishing", "RequestReel")
-                    task.wait(0.35)
+                    task.wait(0.25)
                 end
             end
         end)
