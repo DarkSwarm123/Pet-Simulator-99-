@@ -452,7 +452,7 @@ local Section = MinigamesTab:CreateSection("Fishing")
 
 local advancedFishingEnabled = false
 
-YourTab:CreateToggle({
+local AdvancedFishingToggle = MinigamesTab:CreateToggle({
     Name = "Auto Advanced Fishing",
     CurrentValue = false,
     Flag = "AutoFishing",
