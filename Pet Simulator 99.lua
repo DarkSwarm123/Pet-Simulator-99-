@@ -283,7 +283,7 @@ ItemsTab:CreateToggle({
 
 local CharmStoneOpen = false
 local OpenCharmStoneToggle = ItemsTab:CreateToggle({
-    Name = "Open Charm Stone",
+    Name = "Auto Open Charm Stone",
     CurrentValue = false,
     Flag = "OpenCharmStoneToggle",
     Callback = function(Value)
