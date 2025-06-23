@@ -426,7 +426,7 @@ local autoFuseRunning = false
 
 -- Przełącznik Auto Fuse
 local FuseToggle = MainTab:CreateToggle({
-    Name = "Włącz Auto Fuse",
+    Name = "Enable Auto Fuse",
     CurrentValue = false,
     Flag = "AutoFuseToggle",
     Callback = function(Value)
