@@ -276,7 +276,7 @@ ItemsTab:CreateToggle({
                     game:GetService("ReplicatedStorage").Network.ForgeMachine_Activate:InvokeServer(unpack(args))
                 end)
             end
-            -- Odstęp czasowy 
+           task.wait(1) -- Odstęp czasowy 
         end
     end
 })
