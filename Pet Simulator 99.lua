@@ -235,6 +235,52 @@ local SeedBagToggle = GardenTab:CreateToggle({
     end
 })
 
+local targetNames = {
+    ["Diamonds"] = true,
+    ["Coins"] = true,
+    ["Bonus"] = true,
+    ["Criticals"] = true,
+    ["Agility"] = true,
+    ["Lightning"] = true,
+    ["Strength"] = true,
+    ["TNT"] = true
+}
+
+local AutoForge = false
+ItemsTab:CreateToggle({
+    Name = "Auto Forge Charm Stones",
+    CurrentValue = false,
+    Callback = function(Value)
+        AutoForge = Value
+        while AutoForge do
+            local inventory = Save.Get().Inventory
+            local charmSection = inventory.Charm
+            local charmArgs = {}
+            local totalCharms = 0  
+
+            for id, charm in pairs(charmSection) do
+                if charm and targetNames[charm.id] then
+                    local charmValue = charm._am or 1
+                    charmArgs[id] = charmValue
+                    totalCharms = totalCharms + charmValue
+                end
+            end
+
+            if totalCharms >= 100 then  
+                local args = {
+                    [1] = "Charm Stone",
+                    [2] = charmArgs
+                }
+
+                pcall(function()
+                    game:GetService("ReplicatedStorage").Network.ForgeMachine_Activate:InvokeServer(unpack(args))
+                end)
+            end
+            -- Odstęp czasowy 
+        end
+    end
+})
+
 local CharmStoneOpen = false
 local OpenCharmStoneToggle = ItemsTab:CreateToggle({
     Name = "Open Charm Stone",
