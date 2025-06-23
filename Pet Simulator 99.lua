@@ -278,6 +278,30 @@ ItemsTab:CreateToggle({
     end
 })
 
+local AutoForgeGifts = false
+ItemsTab:CreateToggle({
+    Name = "Auto Forge Large Gift Bags",
+    CurrentValue = false,
+    Callback = function(Value)
+        AutoForgeGifts = Value
+        while AutoForgeGifts do            
+            local inventory = Save.Get().Inventory.Misc
+            for id, giftbag in pairs(inventory) do
+                if giftbag.id == "Gift Bag" and (giftbag._am or 1) >= 4 then
+                    local args = {
+                        [1] = "Large Gift Bag",
+                        [2] = {
+                            [id] = giftbag._am
+                        }
+                    }                    game:GetService("ReplicatedStorage").Network.ForgeMachine_Activate:InvokeServer(unpack(args))
+                    print("✅ Wysłano " .. giftbag._am .. " Gift Bag do przetopu")
+                end
+            end
+            task.wait(1)
+        end
+    end
+})
+
 local CharmStoneOpen = false
 local OpenCharmStoneToggle = ItemsTab:CreateToggle({
     Name = "Auto Open Charm Stone",
