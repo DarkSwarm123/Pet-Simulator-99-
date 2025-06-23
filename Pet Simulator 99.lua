@@ -274,8 +274,12 @@ ItemsTab:CreateToggle({
                     [2] = charmArgs
                 }
 
-                pcall(function()
-                    game:GetService("ReplicatedStorage").Network.ForgeMachine_Activate:InvokeServer(unpack(args))
+local success, result = pcall(function()    game:GetService("ReplicatedStorage").Network.ForgeMachine_Activate:InvokeServer(unpack(args))
+end)
+
+if success then
+    print("✅ Wysłano charm'y (łączna wartość: " .. totalCharms .. ")")
+end
                 end)
             end
            task.wait(1) -- Odstęp czasowy 
