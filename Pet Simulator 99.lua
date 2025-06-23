@@ -235,8 +235,6 @@ local SeedBagToggle = GardenTab:CreateToggle({
     end
 })
 
-ItemsTab:CreateSection("Item Fusing Machine")
-
 local targetNames = {
     ["Diamonds"] = true,
     ["Coins"] = true,
@@ -310,8 +308,6 @@ ItemsTab:CreateToggle({
         end
     end
 })
-
-ItemsTab:CreateSection("Items and Giftboxes")
 
 local CharmStoneOpen = false
 local OpenCharmStoneToggle = ItemsTab:CreateToggle({
