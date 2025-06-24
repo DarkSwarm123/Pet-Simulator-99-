@@ -549,6 +549,7 @@ local RemoteSpyButton = OtherTab:CreateButton({
 })
 
 local advancedFishingEnabled = false
+
 local AdvancedFishingToggle = MinigamesTab:CreateToggle({
     Name = "Auto Advanced Fishing",
     CurrentValue = false,
@@ -556,23 +557,33 @@ local AdvancedFishingToggle = MinigamesTab:CreateToggle({
     Callback = function(Value)
         advancedFishingEnabled = Value
 
-        task.spawn(function()
-            while advancedFishingEnabled do
-                -- RequestCast (rzut wędką)
-                local pos = Vector3.new(1468.33, 61.62, -4449.37)
-                game:GetService("ReplicatedStorage").Network.Instancing_InvokeCustomFromClient:InvokeServer("AdvancedFishing", "RequestCast", pos)
+        -- Sprawdź czy jesteśmy w instancji AdvancedFishing.
+        local saveData = Save.Get()
+        if advancedFishingEnabled and not (saveData and saveData.EnteredInstances and saveData.EnteredInstances["AdvancedFishing"]) then
+            print("Nie znajdujesz się w instancji AdvancedFishing – wyłączam Auto Advanced Fishing toggle")
+            AdvancedFishingToggle:Set(false)
+            advancedFishingEnabled = false
+            return
+        end
 
-                task.wait()
+        if advancedFishingEnabled then
+            task.spawn(function()
+                while advancedFishingEnabled do
+                    -- RequestCast (rzut wędką)
+                    local pos = Vector3.new(1468.33, 61.62, -4449.37)
+                    game:GetService("ReplicatedStorage").Network.Instancing_InvokeCustomFromClient:InvokeServer("AdvancedFishing", "RequestCast", pos)
+                    task.wait()  -- krótkie odczekanie
 
-                -- Symulacja klikania i zwijania przez 5 cykli
-                for i = 1, 5 do
-                    if not advancedFishingEnabled then break end
-                    game:GetService("ReplicatedStorage").Network.Instancing_InvokeCustomFromClient:InvokeServer("AdvancedFishing", "Clicked")
-                    game:GetService("ReplicatedStorage").Network.Instancing_FireCustomFromClient:FireServer("AdvancedFishing", "RequestReel")
-                    task.wait(0.25)
+                    -- Symulacja kliknięć oraz żądanie "reelu" w 5 cyklach
+                    for i = 1, 5 do
+                        if not advancedFishingEnabled then break end
+                        game:GetService("ReplicatedStorage").Network.Instancing_InvokeCustomFromClient:InvokeServer("AdvancedFishing", "Clicked")
+                        game:GetService("ReplicatedStorage").Network.Instancing_FireCustomFromClient:FireServer("AdvancedFishing", "RequestReel")
+                        task.wait(0.25)
+                    end
                 end
-            end
-        end)
+            end)
+        end
     end,
 })
 
