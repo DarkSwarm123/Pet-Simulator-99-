@@ -235,6 +235,8 @@ local SeedBagToggle = GardenTab:CreateToggle({
     end
 })
 
+local Section = ItemsTab:CreateSection("Forge Machine")
+
 local targetNames = {
     ["Diamonds"] = true,
     ["Coins"] = true,
@@ -313,6 +315,8 @@ ItemsTab:CreateToggle({
         end)
     end
 })
+
+local Section = ItemsTab:CreateSection("Lootboxes")
 
 local CharmStoneOpen = false
 local OpenCharmStoneToggle = ItemsTab:CreateToggle({
