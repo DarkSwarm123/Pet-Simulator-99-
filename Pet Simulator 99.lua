@@ -555,17 +555,7 @@ local AdvancedFishingToggle = MinigamesTab:CreateToggle({
     CurrentValue = false,
     Flag = "AutoFishing",
     Callback = function(Value)
-        advancedFishingEnabled = Value
-
-        -- Sprawdź czy jesteśmy w instancji AdvancedFishing.
-        local saveData = Save.Get()
-        if advancedFishingEnabled and not (saveData and saveData.EnteredInstances and saveData.EnteredInstances["AdvancedFishing"]) then
-            print("Nie znajdujesz się w instancji AdvancedFishing – wyłączam Auto Advanced Fishing toggle")
-            AdvancedFishingToggle:Set(false)
-            advancedFishingEnabled = false
-            return
-        end
-
+        advancedFishingEnabled = Value        
         if advancedFishingEnabled then
             task.spawn(function()
                 while advancedFishingEnabled do
