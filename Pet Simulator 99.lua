@@ -1,20 +1,37 @@
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local Window = Rayfield:CreateWindow({
-    Name = "Pet Simulator 99 Script",
-    LoadingTitle = "Loading...",
-    LoadingSubtitle = "by Dark",
-    ConfigurationSaving = {
-       Enabled = false,
-       FolderName = RayfieldGUIconfig,
-       FileName = "Pet Simulator 99"
-    },
-    Discord = {
-       Enabled = false,
-       Invite = "",
-       RememberJoins = true
-    },
-    KeySystem = false
+   Name = "Pet Simulator 99 Script",
+   Icon = 0, 
+   LoadingTitle = "Pet Simulator 99",
+   LoadingSubtitle = "by Dark",
+   ShowText = "Rayfield",
+   Theme = "DarkBlue", 
+   ToggleUIKeybind = "R",
+   DisableRayfieldPrompts = true,
+   DisableBuildWarnings = true,
+   ConfigurationSaving = {
+      Enabled = true,
+      FolderName = "Rayfield GUIconfig", 
+      FileName = "Pet Simulator 99"
+   },
+
+   Discord = {
+      Enabled = false, 
+      Invite = "noinvitelink",
+      RememberJoins = true 
+   },
+
+   KeySystem = false, 
+   KeySettings = {
+      Title = "Untitled",
+      Subtitle = "Key System",
+      Note = "No method of obtaining the key is provided", 
+      FileName = "Key",
+      SaveKey = true, 
+      GrabKeyFromSite = false,
+      Key = {"Hello"} 
+   }
 })
 
 local MainTab = Window:CreateTab("Main", 4483362458)
