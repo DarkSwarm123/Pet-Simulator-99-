@@ -252,29 +252,34 @@ ItemsTab:CreateToggle({
     CurrentValue = false,
     Callback = function(Value)
         AutoForge = Value
-        while AutoForge do
-            local inventory = Save.Get().Inventory
-            local charmSection = inventory.Charm
-            local charmArgs = {}
-            local totalCharms = 0  
 
-            for id, charm in pairs(charmSection) do
-                if charm and targetNames[charm.id] then
-                    local charmValue = charm._am or 1
-                    charmArgs[id] = charmValue
-                    totalCharms = totalCharms + charmValue
+        task.spawn(function()
+            while AutoForge do
+                local inventory = Save.Get().Inventory
+                local charmSection = inventory.Charm
+                local charmArgs = {}
+                local totalCharms = 0  
+
+                for id, charm in pairs(charmSection) do
+                    if charm and targetNames[charm.id] then
+                        local charmValue = charm._am or 1
+                        charmArgs[id] = charmValue
+                        totalCharms = totalCharms + charmValue
+                    end
                 end
-            end
 
-            if totalCharms >= 100 then  
-                local args = {
-                    [1] = "Charm Stone",
-                    [2] = charmArgs
-                }
-                game:GetService("ReplicatedStorage").Network.ForgeMachine_Activate:InvokeServer(unpack(args))
+                if totalCharms >= 100 then  
+                    local args = {
+                        [1] = "Charm Stone",
+                        [2] = charmArgs
+                    }
+                    game:GetService("ReplicatedStorage").Network.ForgeMachine_Activate:InvokeServer(unpack(args))
+                    warn("Total amount of charms sent: " .. totalCharms)
+                end
+
+                task.wait(1) -- odstęp między kolejnymi sprawdzeniami
             end
-            task.wait(1) -- Odstęp czasowy 
-        end
+        end)
     end
 })
 
@@ -284,21 +289,28 @@ ItemsTab:CreateToggle({
     CurrentValue = false,
     Callback = function(Value)
         AutoForgeGifts = Value
-        while AutoForgeGifts do            
-            local inventory = Save.Get().Inventory.Misc
-            for id, giftbag in pairs(inventory) do
-                if giftbag.id == "Gift Bag" and (giftbag._am or 1) >= 4 then
-                    local args = {
-                        [1] = "Large Gift Bag",
-                        [2] = {
-                            [id] = giftbag._am
+        task.spawn(function()
+            while AutoForgeGifts do
+                local inventory = Save.Get().Inventory.Misc
+                for id, giftbag in pairs(inventory) do
+                    if giftbag.id == "Gift Bag" and (giftbag._am or 1) >= 4 then
+                        local amountToUse = giftbag._am -- możesz też zrobić math.floor(giftbag._am / 4) * 4, jeśli chcesz pełne grupy
+
+                        local args = {
+                            [1] = "Large Gift Bag",
+                            [2] = {
+                                [id] = amountToUse
+                            }
                         }
-                    }                    game:GetService("ReplicatedStorage").Network.ForgeMachine_Activate:InvokeServer(unpack(args))
-                    print("✅ Wysłano " .. giftbag._am .. " Gift Bag do przetopu")
+
+                        game:GetService("ReplicatedStorage").Network.ForgeMachine_Activate:InvokeServer(unpack(args))
+                        print("✅ Wysłano " .. amountToUse .. " Gift Bag do przetopu")
+                        break -- żeby nie próbowało kilku na raz w jednej iteracji
+                    end
                 end
+                task.wait(1) -- odstęp między sprawdzeniami
             end
-            task.wait(1)
-        end
+        end)
     end
 })
 
