@@ -12,7 +12,7 @@ local Window = Rayfield:CreateWindow({
    DisableBuildWarnings = true,
    ConfigurationSaving = {
       Enabled = true,
-      FolderName = "Rayfield GUIconfig", 
+      FolderName = "RayfieldGUIconfig", 
       FileName = "Pet Simulator 99"
    },
 
