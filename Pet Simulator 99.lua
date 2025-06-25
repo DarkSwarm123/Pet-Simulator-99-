@@ -41,7 +41,12 @@ local GardenTab = Window:CreateTab("Garden", 15555104643)
 local MinigamesTab = Window:CreateTab("Minigames", 4483362458)
 
 local orb = require(game:GetService("ReplicatedStorage").Library.Client.OrbCmds.Orb)
+orb.DefaultPickupDistance = math.huge
 orb.CollectDistance = math.huge
+orb.CombineDistance = math.huge
+orb.CombineDelay = 0
+orb.SoundDistance = 0
+orb.BillboardDistance = 0
 
 local function Wait(x)
     local startTick = tick()  -- Czas rzeczywisty
