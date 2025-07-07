@@ -457,7 +457,6 @@ local DaycareToggle = MainTab:CreateToggle({
                         end
                     end
 
-                    -- Jeśli są gotowe do odebrania LUB nie ma żadnych w Daycare
                     if readyToClaim or next(active) == nil then
                         Network["Daycare: Claim"]:InvokeServer()
                         task.wait(1)
@@ -479,69 +478,56 @@ local DaycareToggle = MainTab:CreateToggle({
     end,
 })
 
--- Zmienna sterująca Auto Fuse
-local autoFuseEnabled = false
-local autoFuseRunning = false  
+local autoFuseEnabled = false 
 
--- Przełącznik Auto Fuse
 local FuseToggle = MainTab:CreateToggle({
     Name = "Enable Auto Fuse",
     CurrentValue = false,
     Flag = "AutoFuseToggle",
     Callback = function(Value)
         autoFuseEnabled = Value
-        if autoFuseEnabled then
-            autoFuseRunning = true  -- Rozpocznij pętlę
-        else
-            autoFuseRunning = false  -- Zatrzymaj pętlę
-        end
     end
 })
 
--- Zamiast loadstring, załaduj dane bezpośrednio
-local petData = {
-    [1] = {["c20cde7f3c1c4bab9ca538485e433bde"] = 100},
-    [2] = {["7997b1421a5745dcae4e88cfd36b082a"] = 100},
-    [3] = {["94b2999bccf94acd81dd9fbdf31cfa6b"] = 100},
-    [4] = {["20bd2e4cf55f42a89cd8b22be26d6a54"] = 100},
-    [5] = {["03ac4b9426814d02ae7639d76a3d83f6"] = 100},
-    [6] = {["43b8de0025954eb9875902cf864cf29d"] = 100},
-    [7] = {["3e6adacbda8d4e2db8f383151635ff6b"] = 100},
-    [8] = {["1131a05c6f1c45c3a735de27775f69a8"] = 100}
-}
+local AMOUNT_TO_USE = 100
 
--- Funkcja Auto Fuse
 task.spawn(function()
     while true do
-        if autoFuseRunning then
-            if petData then
-                -- Iterujemy po danych petów
-                for _, petSet in ipairs(petData) do
-                    local args = {}
+        if autoFuseEnabled then
+            local pets = Save.Get().Inventory.Pet
+            if pets then
+                local bestPetId = nil
+                local bestAmount = 0
 
-                    -- Przygotowanie argumentów dla FuseMachine_Activate
-                    for petId, quantity in pairs(petSet) do
-                        table.insert(args, { [petId] = quantity })
+                for uniqueId, pet in pairs(pets) do
+                    if pet._am and pet._am >= AMOUNT_TO_USE then
+                        if pet._am > bestAmount then
+                            bestPetId = uniqueId
+                            bestAmount = pet._am
+                        end
                     end
+                end
 
-                    -- Wywołanie FuseMachine_Activate z odpowiednimi petami
-                    local successFuse, errorMessage = pcall(function()
-                        game:GetService("ReplicatedStorage").Network.FuseMachine_Activate:InvokeServer(unpack(args))
+                if bestPetId then
+                    local args = {
+                        [bestPetId] = AMOUNT_TO_USE
+                    }
+
+                    local success, err = pcall(function()
+                        game:GetService("ReplicatedStorage").Network.FuseMachine_Activate:InvokeServer(args)
                     end)
 
-                    if successFuse then
-                        print("Pomyślnie wysłano fuzję dla:", args)
+                    if success then
+                        print("✅ Wysłano fuzję:", AMOUNT_TO_USE, "x", pets[bestPetId].id)
                     else
-                        warn("Błąd przy wysyłaniu fuzji:", errorMessage)
+                        warn("❌ Błąd fuzji:", err)
                     end
-
-                    Wait(2)  -- Czas oczekiwania dla stabilności
+                else
+                    warn("ℹ️ Brak peta z ilością ≥", AMOUNT_TO_USE)
                 end
-            else
-                warn("Dane o petach nie zostały załadowane poprawnie.")
             end
         end
-        task.wait()  -- Czekaj przed ponownym sprawdzeniem
+        task.wait(2)
     end
 end)
 
