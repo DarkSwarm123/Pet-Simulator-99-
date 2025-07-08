@@ -325,8 +325,7 @@ ItemsTab:CreateToggle({
                 local inventory = Save.Get().Inventory.Misc
                 for id, giftbag in pairs(inventory) do
                     if giftbag.id == "Gift Bag" and (giftbag._am or 1) >= 4 then
-                        local amountToUse = giftbag._am -- możesz też zrobić math.floor(giftbag._am / 4) * 4, jeśli chcesz pełne grupy
-
+                        local amountToUse = math.floor(giftbag._am / 4) * 4
                         local args = {
                             [1] = "Large Gift Bag",
                             [2] = {
