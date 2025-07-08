@@ -222,7 +222,7 @@ local GardenCycleToggle = GardenTab:CreateToggle({
     Flag = "GardenCycleToggle",
     Callback = function(Value)
         gardenCycleEnabled = Value
-        if gardenCycleEnabled then
+        if gardenCycleEnabled and game.PlaceId == 8737899170 then
             for i = 1, 10 do
                 task.spawn(function()
                     local args1 = {"FlowerGarden", "ClaimPlant", i}
@@ -231,6 +231,13 @@ local GardenCycleToggle = GardenTab:CreateToggle({
                 task.wait()
             end
             task.spawn(gardenCycle)
+else
+    Rayfield:Notify({
+        Title = "Auto Digsite",
+        Content = "You are not in Spawn World!",
+        Duration = 5,
+        Image = 4483362458,
+    })
         end
     end
 })
@@ -540,7 +547,7 @@ local AdvancedFishingToggle = MinigamesTab:CreateToggle({
     Callback = function(Value)
         advancedFishingEnabled = Value
 
-        if advancedFishingEnabled then
+        if advancedFishingEnabled and game.PlaceId == 8737899170 then
             task.spawn(function()
                 local Players = game:GetService("Players")
                 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -610,6 +617,13 @@ local AdvancedFishingToggle = MinigamesTab:CreateToggle({
                     task.wait(0.4)
                 end
             end)
+else
+    Rayfield:Notify({
+        Title = "Auto Digsite",
+        Content = "You are not in Spawn World!",
+        Duration = 5,
+        Image = 4483362458,
+    })
         end
     end,
 })
@@ -622,7 +636,7 @@ MinigamesTab:CreateToggle({
     Flag = "AutoDigsite",
     Callback = function(Value)
         autoDigsite = Value
-        if autoDigsite then
+        if autoDigsite and game.PlaceId == 8737899170 then
             task.spawn(function()
                 if not workspace.__THINGS.__INSTANCE_CONTAINER.Active:FindFirstChild("Digsite") then
                     local tpCFrame = workspace.__THINGS.Instances.Digsite.Teleports.Enter.CFrame
@@ -678,6 +692,13 @@ MinigamesTab:CreateToggle({
                     task.wait()
                 end
             end)
+else
+    Rayfield:Notify({
+        Title = "Auto Digsite",
+        Content = "You are not in Spawn World!",
+        Duration = 5,
+        Image = 4483362458,
+    })
         end
     end,
 })
