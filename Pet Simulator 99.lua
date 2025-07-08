@@ -531,14 +531,6 @@ task.spawn(function()
     end
 end)
 
--- Przycisk uruchamiający RemoteSpy (dla mobilnych urządzeń)
-local RemoteSpyButton = OtherTab:CreateButton({
-    Name = "RemoteSpy (For Mobile)",
-    Callback = function()
-        loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Simple-Spy-32021"))()
-    end
-})
-
 local advancedFishingEnabled = false
 
 local AdvancedFishingToggle = MinigamesTab:CreateToggle({
@@ -557,7 +549,6 @@ local AdvancedFishingToggle = MinigamesTab:CreateToggle({
                 local Player = Players.LocalPlayer
                 local Character = Player.Character or Player.CharacterAdded:Wait()
 
-                -- Wejście do AdvancedFishing
                 if not Workspace.__THINGS.__INSTANCE_CONTAINER.Active:FindFirstChild("AdvancedFishing") then
                     Character:WaitForChild("HumanoidRootPart").CFrame = Workspace.__THINGS.Instances.AdvancedFishing.Teleports.Enter.CFrame
                     Workspace.__THINGS.__INSTANCE_CONTAINER.Active.ChildAdded:Wait()
@@ -597,7 +588,6 @@ local AdvancedFishingToggle = MinigamesTab:CreateToggle({
 
                     if not advancedFishingEnabled then break end
 
-                    -- Czekanie na zawiśnięcie bobbera
                     local previousY
                     repeat
                         local y = playerBobber.Position.Y
@@ -606,26 +596,96 @@ local AdvancedFishingToggle = MinigamesTab:CreateToggle({
                         task.wait()
                     until not advancedFishingEnabled
 
-                    -- Czekanie na opadnięcie
                     local fallY = playerBobber.Position.Y
                     repeat task.wait() until not advancedFishingEnabled or playerBobber.Position.Y < fallY
-
-                    -- RequestReel i spam Clicked aż line zniknie
                     Network.Instancing_FireCustomFromClient:FireServer("AdvancedFishing", "RequestReel")
 
-                    repeat
-                        Network.Instancing_InvokeCustomFromClient:InvokeServer("AdvancedFishing", "Clicked")
+                    repeat                        Network.Instancing_InvokeCustomFromClient:InvokeServer("AdvancedFishing", "Clicked")
                         task.wait()
                     until not advancedFishingEnabled
                         or not Character:FindFirstChild("Model")
                         or not Character.Model:FindFirstChild("Rod")
                         or not Character.Model.Rod:FindFirstChild("FishingLine")
 
-                    task.wait(0.5) -- mała przerwa między cyklami
+                    task.wait(0.4)
                 end
             end)
         end
     end,
+})
+
+local autoDigsite = false
+
+MinigamesTab:CreateToggle({
+    Name = "Auto Digsite",
+    CurrentValue = false,
+    Flag = "AutoDigsite",
+    Callback = function(Value)
+        autoDigsite = Value
+        if autoDigsite then
+            task.spawn(function()
+                if not workspace.__THINGS.__INSTANCE_CONTAINER.Active:FindFirstChild("Digsite") then
+                    local tpCFrame = workspace.__THINGS.Instances.Digsite.Teleports.Enter.CFrame
+                    local hrp = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+                    if hrp then
+                        hrp.CFrame = tpCFrame
+                        task.wait(1) -- krótka pauza po teleportacji
+                    end
+                end
+
+                while autoDigsite do
+                    local function findBlock()
+                        local dist = math.huge
+                        local block = nil
+                        for _, v in pairs(workspace.__THINGS.__INSTANCE_CONTAINER.Active.Digsite.Important.ActiveBlocks:GetChildren()) do
+                            if v:IsA("BasePart") then
+                                local mag = (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - v.Position).Magnitude
+                                if mag < dist then
+                                    dist = mag
+                                    block = v
+                                end
+                            end
+                        end
+                        return block
+                    end
+
+                    local function findChest()
+                        local dist = math.huge
+                        local chest = nil
+                        for _, v in pairs(workspace.__THINGS.__INSTANCE_CONTAINER.Active.Digsite.Important.ActiveChests:GetChildren()) do
+                            if v:IsA("Model") and v:FindFirstChild("Top") then
+                                local mag = (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - v.Top.Position).Magnitude
+                                if mag < dist then
+                                    dist = mag
+                                    chest = v
+                                end
+                            end
+                        end
+                        return chest
+                    end
+
+                    local chest = findChest()
+                    local block = findBlock()
+
+                    if chest then
+                        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = chest.Top.CFrame
+                        game.ReplicatedStorage.Network.Instancing_FireCustomFromClient:FireServer("Digsite", "DigChest", chest:GetAttribute("Coord"))
+                    elseif block then
+                        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = block.CFrame
+                        game.ReplicatedStorage.Network.Instancing_FireCustomFromClient:FireServer("Digsite", "DigBlock", block:GetAttribute("Coord"))
+                    end
+
+                    task.wait()
+                end
+            end)
+        end
+    end,
+})
+
+local RemoteSpyButton = OtherTab:CreateButton({
+    Name = "RemoteSpy (For Mobile)",
+    Callback = function()        loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Simple-Spy-32021"))()
+    end
 })
 
 local scriptPath = game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.Core["Idle Tracking"]
