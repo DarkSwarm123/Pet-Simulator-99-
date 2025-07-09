@@ -360,7 +360,7 @@ CharmStoneOpen = Value
                     if amount >= 1 then
                         game:GetService("ReplicatedStorage").Network.GiftBag_Open:InvokeServer("Charm Stone")
                     else
-                        task.wait(1)
+                        task.wait(0.7)
                     end
                 end
             end)
