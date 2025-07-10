@@ -309,7 +309,7 @@ ItemsTab:CreateToggle({
                     warn("Total amount of charms sent: " .. totalCharms)
                 end
 
-                task.wait(1) -- odstęp między kolejnymi sprawdzeniami
+                task.wait(1) 
             end
         end)
     end
@@ -339,7 +339,7 @@ ItemsTab:CreateToggle({
                         break -- żeby nie próbowało kilku na raz w jednej iteracji
                     end
                 end
-                task.wait(1) -- odstęp między sprawdzeniami
+                task.wait(1)
             end
         end)
     end
@@ -361,7 +361,7 @@ CharmStoneOpen = Value
                     if amount >= 1 then
                         game:GetService("ReplicatedStorage").Network.GiftBag_Open:InvokeServer("Charm Stone")
                     else
-                        task.wait(0.7)
+                        task.wait()
                     end
                 end
             end)
