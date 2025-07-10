@@ -547,84 +547,88 @@ local AdvancedFishingToggle = MinigamesTab:CreateToggle({
     Callback = function(Value)
         advancedFishingEnabled = Value
 
-        if advancedFishingEnabled and game.PlaceId == 8737899170 then
-            task.spawn(function()
-                local Players = game:GetService("Players")
-                local ReplicatedStorage = game:GetService("ReplicatedStorage")
-                local Workspace = game:GetService("Workspace")
-                local Network = ReplicatedStorage:WaitForChild("Network")
-                local Player = Players.LocalPlayer
-                local Character = Player.Character or Player.CharacterAdded:Wait()
+        if not advancedFishingEnabled then return end
 
-                if not Workspace.__THINGS.__INSTANCE_CONTAINER.Active:FindFirstChild("AdvancedFishing") then
-                    Character:WaitForChild("HumanoidRootPart").CFrame = Workspace.__THINGS.Instances.AdvancedFishing.Teleports.Enter.CFrame
-                    Workspace.__THINGS.__INSTANCE_CONTAINER.Active.ChildAdded:Wait()
-                    task.wait(1)
-                end
-
-                while advancedFishingEnabled do
-                    local fishingZone = Workspace.__THINGS.__INSTANCE_CONTAINER.Active.AdvancedFishing
-                    local deepPool = fishingZone:FindFirstChild("Interactable"):FindFirstChild("DeepPool")
-
-                    local castVector
-                    if deepPool then
-                        castVector = Vector3.new(
-                            deepPool.Position.X + Random.new():NextNumber(-4.75, 4.75),
-                            deepPool.Position.Y,
-                            deepPool.Position.Z + Random.new():NextNumber(-4.75, 4.75)
-                        )
-                    else
-                        castVector = Vector3.new(1480 + math.random(-20, 20), 62, -4451 + math.random(-20, 20))
-                    end
-
-                    Network.Instancing_FireCustomFromClient:FireServer("AdvancedFishing", "RequestCast", castVector)
-
-                    local bobbers = fishingZone.Bobbers
-                    bobbers:ClearAllChildren()
-
-                    local playerBobber
-                    repeat
-                        for _, v in pairs(bobbers:GetChildren()) do
-                            if v:FindFirstChild("Bobber") and v.Bobber.Position.X == castVector.X and v.Bobber.Position.Z == castVector.Z then
-                                playerBobber = v.Bobber
-                                break
-                            end
-                        end
-                        task.wait()
-                    until not advancedFishingEnabled or playerBobber
-
-                    if not advancedFishingEnabled then break end
-
-                    local previousY
-                    repeat
-                        local y = playerBobber.Position.Y
-                        if previousY == y then break end
-                        previousY = y
-                        task.wait()
-                    until not advancedFishingEnabled
-
-                    local fallY = playerBobber.Position.Y
-                    repeat task.wait() until not advancedFishingEnabled or playerBobber.Position.Y < fallY
-                    Network.Instancing_FireCustomFromClient:FireServer("AdvancedFishing", "RequestReel")
-
-                    repeat                        Network.Instancing_InvokeCustomFromClient:InvokeServer("AdvancedFishing", "Clicked")
-                        task.wait()
-                    until not advancedFishingEnabled
-                        or not Character:FindFirstChild("Model")
-                        or not Character.Model:FindFirstChild("Rod")
-                        or not Character.Model.Rod:FindFirstChild("FishingLine")
-
-                    task.wait(0.4)
-                end
-            end)
-else
-    Rayfield:Notify({
-        Title = "Auto Advanced Fishing",
-        Content = "You are not in Spawn World!",
-        Duration = 3,
-        Image = 4483362458,
-    })
+        if game.PlaceId ~= 8737899170 then
+            Rayfield:Notify({
+                Title = "Auto Advanced Fishing",
+                Content = "You are not in Spawn World!",
+                Duration = 3,
+                Image = 4483362458,
+            })
+            return
         end
+
+        task.spawn(function()
+            local Players = game:GetService("Players")
+            local ReplicatedStorage = game:GetService("ReplicatedStorage")
+            local Workspace = game:GetService("Workspace")
+            local Network = ReplicatedStorage:WaitForChild("Network")
+            local Player = Players.LocalPlayer
+            local Character = Player.Character or Player.CharacterAdded:Wait()
+
+            if not Workspace.__THINGS.__INSTANCE_CONTAINER.Active:FindFirstChild("AdvancedFishing") then
+                Character:WaitForChild("HumanoidRootPart").CFrame = Workspace.__THINGS.Instances.AdvancedFishing.Teleports.Enter.CFrame
+                Workspace.__THINGS.__INSTANCE_CONTAINER.Active.ChildAdded:Wait()
+                task.wait(1)
+            end
+
+            while advancedFishingEnabled do
+                local fishingZone = Workspace.__THINGS.__INSTANCE_CONTAINER.Active.AdvancedFishing
+                local deepPool = fishingZone:FindFirstChild("Interactable"):FindFirstChild("DeepPool")
+
+                local castVector
+                if deepPool then
+                    castVector = Vector3.new(
+                        deepPool.Position.X + Random.new():NextNumber(-4.75, 4.75),
+                        deepPool.Position.Y,
+                        deepPool.Position.Z + Random.new():NextNumber(-4.75, 4.75)
+                    )
+                else
+                    castVector = Vector3.new(1480 + math.random(-20, 20), 62, -4451 + math.random(-20, 20))
+                end
+
+                Network.Instancing_FireCustomFromClient:FireServer("AdvancedFishing", "RequestCast", castVector)
+
+                local bobbers = fishingZone.Bobbers
+                bobbers:ClearAllChildren()
+
+                local playerBobber
+                repeat
+                    for _, v in pairs(bobbers:GetChildren()) do
+                        if v:FindFirstChild("Bobber") and v.Bobber.Position.X == castVector.X and v.Bobber.Position.Z == castVector.Z then
+                            playerBobber = v.Bobber
+                            break
+                        end
+                    end
+                    task.wait()
+                until not advancedFishingEnabled or playerBobber
+
+                if not advancedFishingEnabled then break end
+
+                local previousY
+                repeat
+                    local y = playerBobber.Position.Y
+                    if previousY == y then break end
+                    previousY = y
+                    task.wait()
+                until not advancedFishingEnabled
+
+                local fallY = playerBobber.Position.Y
+                repeat task.wait() until not advancedFishingEnabled or playerBobber.Position.Y < fallY
+                Network.Instancing_FireCustomFromClient:FireServer("AdvancedFishing", "RequestReel")
+
+                repeat
+                    Network.Instancing_InvokeCustomFromClient:InvokeServer("AdvancedFishing", "Clicked")
+                    task.wait()
+                until not advancedFishingEnabled
+                    or not Character:FindFirstChild("Model")
+                    or not Character.Model:FindFirstChild("Rod")
+                    or not Character.Model.Rod:FindFirstChild("FishingLine")
+
+                task.wait(0.4)
+            end
+        end)
     end,
 })
 
@@ -636,70 +640,73 @@ MinigamesTab:CreateToggle({
     Flag = "AutoDigsite",
     Callback = function(Value)
         autoDigsite = Value
-        if autoDigsite and game.PlaceId == 8737899170 then
-            task.spawn(function()
-                if not workspace.__THINGS.__INSTANCE_CONTAINER.Active:FindFirstChild("Digsite") then
-                    local tpCFrame = workspace.__THINGS.Instances.Digsite.Teleports.Enter.CFrame
-                    local hrp = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-                    if hrp then
-                        hrp.CFrame = tpCFrame
-                        task.wait(1) -- krótka pauza po teleportacji
-                    end
-                end
+        if not autoDigsite then return end
 
-                while autoDigsite do
-                    local function findBlock()
-                        local dist = math.huge
-                        local block = nil
-                        for _, v in pairs(workspace.__THINGS.__INSTANCE_CONTAINER.Active.Digsite.Important.ActiveBlocks:GetChildren()) do
-                            if v:IsA("BasePart") then
-                                local mag = (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - v.Position).Magnitude
-                                if mag < dist then
-                                    dist = mag
-                                    block = v
-                                end
-                            end
-                        end
-                        return block
-                    end
-
-                    local function findChest()
-                        local dist = math.huge
-                        local chest = nil
-                        for _, v in pairs(workspace.__THINGS.__INSTANCE_CONTAINER.Active.Digsite.Important.ActiveChests:GetChildren()) do
-                            if v:IsA("Model") and v:FindFirstChild("Top") then
-                                local mag = (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - v.Top.Position).Magnitude
-                                if mag < dist then
-                                    dist = mag
-                                    chest = v
-                                end
-                            end
-                        end
-                        return chest
-                    end
-
-                    local chest = findChest()
-                    local block = findBlock()
-
-                    if chest then
-                        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = chest.Top.CFrame
-                        game.ReplicatedStorage.Network.Instancing_FireCustomFromClient:FireServer("Digsite", "DigChest", chest:GetAttribute("Coord"))
-                    elseif block then
-                        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = block.CFrame
-                        game.ReplicatedStorage.Network.Instancing_FireCustomFromClient:FireServer("Digsite", "DigBlock", block:GetAttribute("Coord"))
-                    end
-
-                    task.wait()
-                end
-            end)
-else
-    Rayfield:Notify({
-        Title = "Auto Digsite",
-        Content = "You are not in Spawn World!",
-        Duration = 3,
-        Image = 4483362458,
-    })
+        if game.PlaceId ~= 8737899170 then
+            Rayfield:Notify({
+                Title = "Auto Digsite",
+                Content = "You are not in Spawn World!",
+                Duration = 3,
+                Image = 4483362458,
+            })
+            return
         end
+
+        task.spawn(function()
+            if not workspace.__THINGS.__INSTANCE_CONTAINER.Active:FindFirstChild("Digsite") then
+                local tpCFrame = workspace.__THINGS.Instances.Digsite.Teleports.Enter.CFrame
+                local hrp = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+                if hrp then
+                    hrp.CFrame = tpCFrame
+                    task.wait(1)
+                end
+            end
+
+            while autoDigsite do
+                local function findBlock()
+                    local dist = math.huge
+                    local block = nil
+                    for _, v in pairs(workspace.__THINGS.__INSTANCE_CONTAINER.Active.Digsite.Important.ActiveBlocks:GetChildren()) do
+                        if v:IsA("BasePart") then
+                            local mag = (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - v.Position).Magnitude
+                            if mag < dist then
+                                dist = mag
+                                block = v
+                            end
+                        end
+                    end
+                    return block
+                end
+
+                local function findChest()
+                    local dist = math.huge
+                    local chest = nil
+                    for _, v in pairs(workspace.__THINGS.__INSTANCE_CONTAINER.Active.Digsite.Important.ActiveChests:GetChildren()) do
+                        if v:IsA("Model") and v:FindFirstChild("Top") then
+                            local mag = (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - v.Top.Position).Magnitude
+                            if mag < dist then
+                                dist = mag
+                                chest = v
+                            end
+                        end
+                    end
+                    return chest
+                end
+
+                local chest = findChest()
+                local block = findBlock()
+
+                if chest then
+                    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = chest.Top.CFrame
+                    game.ReplicatedStorage.Network.Instancing_FireCustomFromClient:FireServer("Digsite", "DigChest", chest:GetAttribute("Coord"))
+                elseif block then
+                    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = block.CFrame
+                    game.ReplicatedStorage.Network.Instancing_FireCustomFromClient:FireServer("Digsite", "DigBlock", block:GetAttribute("Coord"))
+                end
+
+                task.wait()
+            end
+        end)
     end,
 })
 
