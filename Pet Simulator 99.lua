@@ -619,9 +619,9 @@ local AdvancedFishingToggle = MinigamesTab:CreateToggle({
             end)
 else
     Rayfield:Notify({
-        Title = "Auto Digsite",
+        Title = "Auto Advanced Fishing",
         Content = "You are not in Spawn World!",
-        Duration = 5,
+        Duration = 3,
         Image = 4483362458,
     })
         end
@@ -696,7 +696,7 @@ else
     Rayfield:Notify({
         Title = "Auto Digsite",
         Content = "You are not in Spawn World!",
-        Duration = 5,
+        Duration = 3,
         Image = 4483362458,
     })
         end
