@@ -1,4 +1,11 @@
 repeat task.wait() until game:IsLoaded()
+repeat task.wait() until game.PlaceId 
+local Players = game:GetService("Players")
+repeat task.wait() until Players.LocalPlayer
+local Player = Players.LocalPlayer
+repeat task.wait() until Player.Character and Player.Character:FindFirstChild("HumanoidRootPart")
+local Workspace = game:GetService("Workspace")
+repeat task.wait() until Workspace:FindFirstChild("__THINGS") and Workspace:FindFirstChild("__DEBRIS")
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local Window = Rayfield:CreateWindow({
