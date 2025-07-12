@@ -438,6 +438,12 @@ local UltimateToggle = MainTab:CreateToggle({
     end,
 })
 
+local function GetPetTypeString(pt)
+    if pt == 1 then return "GOLD"
+    elseif pt == 2 then return "RAINBOW"
+    else return "NORMAL" end
+end
+
 local AutoDaycare = false
 
 local DaycareToggle = MainTab:CreateToggle({
@@ -449,9 +455,7 @@ local DaycareToggle = MainTab:CreateToggle({
         task.spawn(function()
             local ReplicatedStorage = game:GetService("ReplicatedStorage")
             local Network = ReplicatedStorage.Network
-            local DaycareCmds = require(ReplicatedStorage.Library.Client.DaycareCmds)
-            local Save = require(ReplicatedStorage.Library.Client.Save)
-
+            local DaycareCmds = require(ReplicatedStorage.Library.Client.DaycareCmds)            
             while AutoDaycare do
                 pcall(function()
                     local active = Save.Get().DaycareActive or {}
@@ -467,12 +471,17 @@ local DaycareToggle = MainTab:CreateToggle({
                     if readyToClaim or next(active) == nil then
                         Network["Daycare: Claim"]:InvokeServer()
                         task.wait(1)
-
                         local maxSlots = DaycareCmds.GetMaxSlots()
+                        local selectedPet = "dc1ae03e7e8b4f068d6bc5c6ab789784"
+                        local petData = Save.Get().Inventory.Pet[selectedPet]
+                        local name = petData and petData.id or "?"
+                        local typeStr = petData and GetPetTypeString(petData.pt or 0) or "?"
+
+                        print("📤 Wysłano do Daycare:", maxSlots .. "x", name, "(" .. typeStr .. ")")
 
                         local args = {
                             [1] = {
-                                ["dc1ae03e7e8b4f068d6bc5c6ab789784"] = maxSlots
+                                [selectedPet] = maxSlots
                             }
                         }
 
@@ -497,12 +506,6 @@ local FuseToggle = MainTab:CreateToggle({
 })
 
 local AMOUNT_TO_USE = 100
-
-local function GetPetTypeString(pt)
-    if pt == 1 then return "GOLD"
-    elseif pt == 2 then return "RAINBOW"
-    else return "NORMAL" end
-end
 
 task.spawn(function()
     while true do
