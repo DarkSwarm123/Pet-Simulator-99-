@@ -498,39 +498,43 @@ local FuseToggle = MainTab:CreateToggle({
 
 local AMOUNT_TO_USE = 100
 
+local function GetPetTypeString(pt)
+    if pt == 1 then return "GOLD"
+    elseif pt == 2 then return "RAINBOW"
+    else return "NORMAL" end
+end
+
 task.spawn(function()
     while true do
         if autoFuseEnabled then
             local pets = Save.Get().Inventory.Pet
             if pets then
-                local bestPetId = nil
-                local bestAmount = 0
+                local bestPetId, bestAmount, bestType, petName = nil, 0, 0, ""
 
                 for uniqueId, pet in pairs(pets) do
                     if pet._am and pet._am >= AMOUNT_TO_USE then
                         if pet._am > bestAmount then
                             bestPetId = uniqueId
                             bestAmount = pet._am
+                            bestType = pet.pt or 0
+                            petName = pet.id or "Unknown"
                         end
                     end
                 end
 
                 if bestPetId then
-                    local args = {
-                        [bestPetId] = AMOUNT_TO_USE
-                    }
-
+                    local args = { [bestPetId] = AMOUNT_TO_USE }
                     local success, err = pcall(function()
                         game:GetService("ReplicatedStorage").Network.FuseMachine_Activate:InvokeServer(args)
                     end)
 
                     if success then
-                        print("✅ Wysłano fuzję:", AMOUNT_TO_USE, "x", pets[bestPetId].id)
+                        print(string.format("✅ Fuzja wysłana: %dx %s (%s)", AMOUNT_TO_USE, petName, GetPetTypeString(bestType)))
                     else
                         warn("❌ Błąd fuzji:", err)
                     end
                 else
-                    warn("ℹ️ Brak peta z ilością ≥", AMOUNT_TO_USE)
+                    print(string.format("ℹ️ Brak peta z ilością ≥ %d", AMOUNT_TO_USE))
                 end
             end
         end
