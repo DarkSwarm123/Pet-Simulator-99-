@@ -47,7 +47,7 @@ orb.CollectDistance = math.huge
 orb.CombineDistance = math.huge
 orb.CombineDelay = 0
 orb.SoundDistance = 0
-orb.BillboardDistance = 20
+orb.BillboardDistance = math.huge
 
 local function Wait(x)
     local startTick = tick()  -- Czas rzeczywisty
