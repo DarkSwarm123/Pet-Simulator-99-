@@ -576,8 +576,7 @@ local AdvancedFishingToggle = MinigamesTab:CreateToggle({
 
             if not Workspace.__THINGS.__INSTANCE_CONTAINER.Active:FindFirstChild("AdvancedFishing") then
                 Character:WaitForChild("HumanoidRootPart").CFrame = Workspace.__THINGS.Instances.AdvancedFishing.Teleports.Enter.CFrame
-                Workspace.__THINGS.__INSTANCE_CONTAINER.Active.ChildAdded:Wait()
-                task.wait(1)
+                repeat task.wait() until Workspace.__THINGS.__INSTANCE_CONTAINER.Active:FindFirstChild("AdvancedFishing") or not advancedFishingEnabled
             end
 
             while advancedFishingEnabled do
