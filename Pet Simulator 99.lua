@@ -574,44 +574,45 @@ local AdvancedFishingToggle = MinigamesTab:CreateToggle({
             local Player = Players.LocalPlayer
             local Character = Player.Character or Player.CharacterAdded:Wait()
 
+            -- Wejście do instancji jeśli nie jesteś
             if not Workspace.__THINGS.__INSTANCE_CONTAINER.Active:FindFirstChild("AdvancedFishing") then
                 Character:WaitForChild("HumanoidRootPart").CFrame = Workspace.__THINGS.Instances.AdvancedFishing.Teleports.Enter.CFrame
                 repeat task.wait() until Workspace.__THINGS.__INSTANCE_CONTAINER.Active:FindFirstChild("AdvancedFishing") or not advancedFishingEnabled
             end
 
+            -- Główna pętla
             while advancedFishingEnabled do
                 local fishingZone = Workspace.__THINGS.__INSTANCE_CONTAINER.Active.AdvancedFishing
                 local deepPool = fishingZone:FindFirstChild("Interactable"):FindFirstChild("DeepPool")
 
-                local castVector
-                if deepPool then
-                    castVector = Vector3.new(
-                        deepPool.Position.X + Random.new():NextNumber(-4.75, 4.75),
-                        deepPool.Position.Y,
-                        deepPool.Position.Z + Random.new():NextNumber(-4.75, 4.75)
-                    )
-                else
-                    castVector = Vector3.new(1480 + math.random(-20, 20), 62, -4451 + math.random(-20, 20))
-                end
+                -- Pozycja rzutu
+                local castVector = deepPool and (deepPool.Position + Vector3.new(Random.new():NextNumber(-4.75, 4.75), 0, Random.new():NextNumber(-4.75, 4.75)))
+                    or Vector3.new(1480 + math.random(-20, 20), 62, -4451 + math.random(-20, 20))
 
+                -- Rzut wędką
                 Network.Instancing_FireCustomFromClient:FireServer("AdvancedFishing", "RequestCast", castVector)
 
+                -- Szukanie bobbera
                 local bobbers = fishingZone.Bobbers
-                bobbers:ClearAllChildren()
-
                 local playerBobber
+                local attempts = 0
                 repeat
+                    attempts += 1
                     for _, v in pairs(bobbers:GetChildren()) do
-                        if v:FindFirstChild("Bobber") and v.Bobber.Position.X == castVector.X and v.Bobber.Position.Z == castVector.Z then
+                        if v:FindFirstChild("Bobber") and (v.Bobber.Position - castVector).Magnitude < 1 then
                             playerBobber = v.Bobber
                             break
                         end
                     end
                     task.wait()
-                until not advancedFishingEnabled or playerBobber
+                until not advancedFishingEnabled or playerBobber or attempts > 100
 
-                if not advancedFishingEnabled then break end
+                if not advancedFishingEnabled or not playerBobber then
+                    task.wait(1)
+                    continue
+                end
 
+                -- Czekanie na spadek bobbera
                 local previousY
                 repeat
                     local y = playerBobber.Position.Y
@@ -622,8 +623,11 @@ local AdvancedFishingToggle = MinigamesTab:CreateToggle({
 
                 local fallY = playerBobber.Position.Y
                 repeat task.wait() until not advancedFishingEnabled or playerBobber.Position.Y < fallY
+
+                -- Zwinięcie
                 Network.Instancing_FireCustomFromClient:FireServer("AdvancedFishing", "RequestReel")
 
+                -- Klikanie
                 repeat
                     Network.Instancing_InvokeCustomFromClient:InvokeServer("AdvancedFishing", "Clicked")
                     task.wait()
