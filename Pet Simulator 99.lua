@@ -660,15 +660,16 @@ MinigamesTab:CreateToggle({
         end
 
         task.spawn(function()
-            if not workspace.__THINGS.__INSTANCE_CONTAINER.Active:FindFirstChild("Digsite") then
-                local tpCFrame = workspace.__THINGS.Instances.Digsite.Teleports.Enter.CFrame
-                local hrp = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-                if hrp then
-                    hrp.CFrame = tpCFrame
-                    task.wait(1)
-                end
-            end
-
+            if not workspace.__THINGS.__INSTANCE_CONTAINER.Active:FindFirstChild("Digsite") then  
+    local tpCFrame = workspace.__THINGS.Instances.Digsite.Teleports.Enter.CFrame  
+    local hrp = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")  
+    if hrp then  
+        hrp.CFrame = tpCFrame  
+        repeat
+            task.wait(0.5)
+        until workspace.__THINGS.__INSTANCE_CONTAINER.Active:FindFirstChild("Digsite") or not autoDigsite
+    end  
+end
             while autoDigsite do
                 local function findBlock()
                     local dist = math.huge
