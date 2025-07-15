@@ -234,7 +234,7 @@ local GardenCycleToggle = GardenTab:CreateToggle({
             task.spawn(gardenCycle)
 else
     Rayfield:Notify({
-        Title = "Auto Digsite",
+        Title = "Auto Garden",
         Content = "You are not in Spawn World!",
         Duration = 5,
         Image = 4483362458,
