@@ -317,11 +317,14 @@ ItemsTab:CreateToggle({
 })
 
 local AutoForgeGifts = false
+
 ItemsTab:CreateToggle({
     Name = "Auto Forge Large Gift Bags",
     CurrentValue = false,
+    Flag = "AutoForgeGiftsToggle",
     Callback = function(Value)
         AutoForgeGifts = Value
+
         task.spawn(function()
             while AutoForgeGifts do
                 local inventory = Save.Get().Inventory.Misc
@@ -337,7 +340,7 @@ ItemsTab:CreateToggle({
 
                         game:GetService("ReplicatedStorage").Network.ForgeMachine_Activate:InvokeServer(unpack(args))
                         print("✅ Wysłano " .. amountToUse .. " Gift Bag do przetopu")
-                        break -- żeby nie próbowało kilku na raz w jednej iteracji
+                        break
                     end
                 end
                 task.wait(1)
