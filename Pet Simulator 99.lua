@@ -587,9 +587,20 @@ local AdvancedFishingToggle = MinigamesTab:CreateToggle({
                 repeat task.wait() until Workspace.__THINGS.__INSTANCE_CONTAINER.Active:FindFirstChild("AdvancedFishing") or not advancedFishingEnabled
             end
 
+            -- Poczekaj na pełne załadowanie strefy wędkarskiej
+            local fishingZone = Workspace.__THINGS.__INSTANCE_CONTAINER.Active:WaitForChild("AdvancedFishing", 10)
+            if not fishingZone then
+                Rayfield:Notify({
+                    Title = "Auto Advanced Fishing",
+                    Content = "❌ Nie udało się załadować instancji!",
+                    Duration = 5,
+                    Image = 4483362458,
+                })
+                return
+            end
+
             -- Główna pętla
             while advancedFishingEnabled do
-                local fishingZone = Workspace.__THINGS.__INSTANCE_CONTAINER.Active.AdvancedFishing
                 local deepPool = fishingZone:FindFirstChild("Interactable"):FindFirstChild("DeepPool")
 
                 -- Pozycja rzutu
@@ -635,6 +646,7 @@ local AdvancedFishingToggle = MinigamesTab:CreateToggle({
                 Network.Instancing_FireCustomFromClient:FireServer("AdvancedFishing", "RequestReel")
 
                 -- Klikanie
+                local Character = Player.Character
                 repeat
                     Network.Instancing_InvokeCustomFromClient:InvokeServer("AdvancedFishing", "Clicked")
                     task.wait()
