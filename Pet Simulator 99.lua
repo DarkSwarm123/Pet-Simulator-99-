@@ -232,7 +232,8 @@ local GardenCycleToggle = GardenTab:CreateToggle({
                 task.wait()
             end
             task.spawn(gardenCycle)
-else
+
+elseif game.PlaceId ~= 8737899170 then
     Rayfield:Notify({
         Title = "Auto Garden",
         Content = "You are not in Spawn World!",
