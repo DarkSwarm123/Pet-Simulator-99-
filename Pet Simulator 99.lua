@@ -741,3 +741,5 @@ game:GetService("Players").LocalPlayer.Idled:Connect(function()
     VIM:SendMouseButtonEvent(0, 0, 0, true, game, 0)
     VIM:SendMouseButtonEvent(0, 0, 0, false, game, 0)
 end)
+
+Rayfield:LoadConfiguration()
