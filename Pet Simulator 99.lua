@@ -279,9 +279,11 @@ local targetNames = {
 }
 
 local AutoForge = false
+
 ItemsTab:CreateToggle({
     Name = "Auto Forge Charm Stones",
     CurrentValue = false,
+    Flag = "AutoForgeToggle",
     Callback = function(Value)
         AutoForge = Value
 
@@ -308,7 +310,6 @@ ItemsTab:CreateToggle({
                     game:GetService("ReplicatedStorage").Network.ForgeMachine_Activate:InvokeServer(unpack(args))
                     warn("Total amount of charms sent: " .. totalCharms)
                 end
-
                 task.wait(1) 
             end
         end)
