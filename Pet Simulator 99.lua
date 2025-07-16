@@ -578,13 +578,16 @@ MinigamesTab:CreateToggle({
         local Workspace = game:GetService("Workspace")
         local Network = ReplicatedStorage:WaitForChild("Network")
 
-        -- Wejdź do instancji jeśli nie jesteś
-        if not Workspace.__THINGS.__INSTANCE_CONTAINER.Active:FindFirstChild("AdvancedFishing") then
-            game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart").CFrame = Workspace.__THINGS.Instances.AdvancedFishing.Teleports.Enter.CFrame
-            repeat task.wait() until Workspace.__THINGS.__INSTANCE_CONTAINER.Active:FindFirstChild("AdvancedFishing") or not advancedFishingEnabled
-        end
+if not Workspace.__THINGS.__INSTANCE_CONTAINER.Active:FindFirstChild("AdvancedFishing") then
+    game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart").CFrame = Workspace.__THINGS.Instances.AdvancedFishing.Teleports.Enter.CFrame
+    repeat task.wait() until Workspace.__THINGS.__INSTANCE_CONTAINER.Active:FindFirstChild("AdvancedFishing") or not advancedFishingEnabled
+end
 
-        -- Pętla automatycznego łowienia
+if advancedFishingEnabled then
+    repeat task.wait() until Workspace.__THINGS.__INSTANCE_CONTAINER.Active.AdvancedFishing:FindFirstChild("Interactable")
+        and #Workspace.__THINGS.__INSTANCE_CONTAINER.Active.AdvancedFishing.Interactable:GetChildren() > 0
+end
+
         task.spawn(function()
             while advancedFishingEnabled do
                 local deepPool
