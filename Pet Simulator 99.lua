@@ -418,9 +418,11 @@ local UltimateCmds = require(game:GetService("ReplicatedStorage").Library.Client
 local MapCmds = require(game:GetService("ReplicatedStorage").Library.Client.MapCmds)
 
 local toggleEnabled = false
+
 local UltimateToggle = MainTab:CreateToggle({
     Name = "Auto Ultimate",
     CurrentValue = false,
+    Flag = "AutoUltimateToggle",
     Callback = function(Value)
         toggleEnabled = Value
 
@@ -432,7 +434,7 @@ local UltimateToggle = MainTab:CreateToggle({
                     if equipped and UltimateCmds.IsCharged(equipped:GetId()) then
                         local success = UltimateCmds.Activate(equipped:GetId())
                         if success then
-                            warn("Ultimate activated!")
+                            warn("✅ Ultimate activated!")
                         end
                     end
                 end
