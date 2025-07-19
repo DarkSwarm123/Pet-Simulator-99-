@@ -563,7 +563,6 @@ MinigamesTab:CreateToggle({
 
         if not advancedFishingEnabled then return end
 
-        -- Sprawdź czy gracz jest w Spawn World
         if game.PlaceId ~= 8737899170 then
             Rayfield:Notify({
                 Title = "Auto Advanced Fishing",
@@ -578,7 +577,6 @@ MinigamesTab:CreateToggle({
         local Workspace = game:GetService("Workspace")
         local Network = ReplicatedStorage:WaitForChild("Network")
 
-        -- Przejście do instancji
         if not Workspace.__THINGS.__INSTANCE_CONTAINER.Active:FindFirstChild("AdvancedFishing") then
             game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart").CFrame =
                 Workspace.__THINGS.Instances.AdvancedFishing.Teleports.Enter.CFrame
@@ -586,7 +584,6 @@ MinigamesTab:CreateToggle({
             repeat task.wait() until Workspace.__THINGS.__INSTANCE_CONTAINER.Active:FindFirstChild("AdvancedFishing") or not advancedFishingEnabled
         end
 
-        -- Czekanie na załadowanie interaktywnych elementów
         if advancedFishingEnabled then
             repeat task.wait() until Workspace.__THINGS.__INSTANCE_CONTAINER.Active.AdvancedFishing:FindFirstChild("Interactable")
                 and #Workspace.__THINGS.__INSTANCE_CONTAINER.Active.AdvancedFishing.Interactable:GetChildren() > 0
@@ -627,7 +624,6 @@ MinigamesTab:CreateToggle({
 
                 if not advancedFishingEnabled or not playerBobber then continue end
 
-                -- Czekanie aż bobber zacznie opadać
                 local previousY
                 repeat
                     local y = playerBobber.Position.Y
@@ -638,21 +634,18 @@ MinigamesTab:CreateToggle({
 
                 local fallY = playerBobber.Position.Y
                 repeat task.wait() until not advancedFishingEnabled or playerBobber.Position.Y < fallY
-
-                -- Zaciągnięcie żyłki
                 Network.Instancing_FireCustomFromClient:FireServer("AdvancedFishing", "RequestReel")
 
-                -- Klikanie gdy wędka aktywna
                 while game.Players.LocalPlayer.Character:FindFirstChild("Model")
                     and game.Players.LocalPlayer.Character.Model:FindFirstChild("Rod")
                     and game.Players.LocalPlayer.Character.Model.Rod:FindFirstChild("FishingLine")
                     and advancedFishingEnabled do
 
                     Network.Instancing_InvokeCustomFromClient:InvokeServer("AdvancedFishing", "Clicked")
-                    task.wait()
+                    task.wait(0.35)
                 end
 
-                task.wait(0.35)
+                task.wait(0.5)
             end
         end)
     end,
