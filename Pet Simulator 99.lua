@@ -479,7 +479,7 @@ local DaycareToggle = MainTab:CreateToggle({
                         Network["Daycare: Claim"]:InvokeServer()
                         task.wait(1)
                         local maxSlots = DaycareCmds.GetMaxSlots()
-                        local selectedPet = "dc1ae03e7e8b4f068d6bc5c6ab789784"
+                        local selectedPet = "b66fba9c183f4616a18823dcfb119b2d"
                         local petData = Save.Get().Inventory.Pet[selectedPet]
                         local name = petData and petData.id or "?"
                         local typeStr = petData and GetPetTypeString(petData.pt or 0) or "?"
@@ -642,10 +642,10 @@ MinigamesTab:CreateToggle({
                     and advancedFishingEnabled do
 
                     Network.Instancing_InvokeCustomFromClient:InvokeServer("AdvancedFishing", "Clicked")
-                    task.wait(0.35)
+                    task.wait(0.4)
                 end
 
-                task.wait(0.3)
+                task.wait(0.5)
             end
         end)
     end,
@@ -724,7 +724,7 @@ end
                     game.ReplicatedStorage.Network.Instancing_FireCustomFromClient:FireServer("Digsite", "DigBlock", block:GetAttribute("Coord"))
                 end
 
-                task.wait()
+                task.wait(0.3)
             end
         end)
     end,
