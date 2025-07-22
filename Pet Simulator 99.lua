@@ -645,7 +645,7 @@ MinigamesTab:CreateToggle({
                     task.wait(0.4)
                 end
 
-                task.wait(0.5)
+                task.wait(0.3)
             end
         end)
     end,
