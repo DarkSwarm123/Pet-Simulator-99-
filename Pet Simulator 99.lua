@@ -557,7 +557,6 @@ local advancedFishingEnabled = false
 MinigamesTab:CreateToggle({
     Name = "Auto Advanced Fishing",
     CurrentValue = false,
-    Flag = "AutoFishing",
     Callback = function(state)
         advancedFishingEnabled = state
 
@@ -656,7 +655,6 @@ local autoDigsite = false
 MinigamesTab:CreateToggle({
     Name = "Auto Digsite",
     CurrentValue = false,
-    Flag = "AutoDigsite",
     Callback = function(Value)
         autoDigsite = Value
         if not autoDigsite then return end
