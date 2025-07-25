@@ -641,10 +641,10 @@ MinigamesTab:CreateToggle({
                     and advancedFishingEnabled do
 
                     Network.Instancing_InvokeCustomFromClient:InvokeServer("AdvancedFishing", "Clicked")
-                    task.wait(0.4)
+                    task.wait(0.5)
                 end
 
-                task.wait(0.3)
+                task.wait(0.5)
             end
         end)
     end,
