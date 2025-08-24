@@ -223,23 +223,27 @@ local GardenCycleToggle = GardenTab:CreateToggle({
     Flag = "GardenCycleToggle",
     Callback = function(Value)
         gardenCycleEnabled = Value
-        if gardenCycleEnabled and game.PlaceId == 8737899170 then
-            for i = 1, 10 do
-                task.spawn(function()
-                    local args1 = {"FlowerGarden", "ClaimPlant", i}
-                    game:GetService("ReplicatedStorage").Network.Instancing_FireCustomFromClient:FireServer(unpack(args1))
-                end)
-                task.wait()
-            end
-            task.spawn(gardenCycle)
+        local container = workspace.__THINGS.__INSTANCE_CONTAINER.Active:FindFirstChild("FlowerGarden")
 
-elseif game.PlaceId ~= 8737899170 then
-    Rayfield:Notify({
-        Title = "Auto Garden",
-        Content = "You are not in Spawn World!",
-        Duration = 5,
-        Image = 4483362458,
-    })
+        if gardenCycleEnabled then
+            if game.PlaceId == 8737899170 and container then
+                for i = 1, 10 do
+                    task.spawn(function()
+                        local args1 = {"FlowerGarden", "ClaimPlant", i}
+                        game:GetService("ReplicatedStorage").Network.Instancing_FireCustomFromClient:FireServer(unpack(args1))
+                    end)
+                    task.wait()
+                end
+                task.spawn(gardenCycle)
+            else
+                Rayfield:Notify({
+                    Title = "Auto Garden",
+                    Content = (container and "You are not in Spawn World!" or "Garden not active!"),
+                    Duration = 5,
+                    Image = 4483362458,
+                })
+                gardenCycleEnabled = false
+            end
         end
     end
 })
