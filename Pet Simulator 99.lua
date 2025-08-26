@@ -207,22 +207,19 @@ local function gardenCycle()
             for i = 1, 10 do
                 local args = {"FlowerGarden", "PlantSeed", i, "Diamond"}
                 game:GetService("ReplicatedStorage").Network.Instancing_InvokeCustomFromClient:InvokeServer(unpack(args))
-                task.wait(0.2)
             end
-
+task.wait()
             for i = 1, 10 do
                 local args = {"FlowerGarden", "InstaGrowSeed", i}
                 game:GetService("ReplicatedStorage").Network.Instancing_InvokeCustomFromClient:InvokeServer(unpack(args))
-                task.wait(0.2)
             end
-
+task.wait()
             for i = 1, 10 do
                 local args = {"FlowerGarden", "ClaimPlant", i}
                 game:GetService("ReplicatedStorage").Network.Instancing_FireCustomFromClient:FireServer(unpack(args))
-                task.wait(0.2)
             end
         else
-            task.wait(1)
+            task.wait()
         end
     end
 end
