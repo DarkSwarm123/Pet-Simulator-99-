@@ -484,7 +484,7 @@ local DaycareToggle = MainTab:CreateToggle({
                         Network["Daycare: Claim"]:InvokeServer()
                         task.wait(1)
                         local maxSlots = DaycareCmds.GetMaxSlots()
-                        local selectedPet = "b66fba9c183f4616a18823dcfb119b2d"
+                        local selectedPet = "73a201f76aa34d6ab46e2c3372fd108c"
                         local petData = Save.Get().Inventory.Pet[selectedPet]
                         local name = petData and petData.id or "?"
                         local typeStr = petData and GetPetTypeString(petData.pt or 0) or "?"
