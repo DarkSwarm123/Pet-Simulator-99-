@@ -186,24 +186,14 @@ local function gardenCycle()
     while gardenCycleEnabled do
         local container = workspace.__THINGS.__INSTANCE_CONTAINER.Active:FindFirstChild("FlowerGarden")
 
-        -- jeżeli brak container, to czekamy aż się pojawi albo toggle zostanie wyłączony
-        if not container then
-            repeat
-                task.wait(1)
-                container = workspace.__THINGS.__INSTANCE_CONTAINER.Active:FindFirstChild("FlowerGarden")
-            until (not gardenCycleEnabled) or container
-        end
-
-        -- jeśli toggle wyłączone w trakcie czekania → wychodzimy z funkcji
         if not gardenCycleEnabled then
             break
         end
 
-        -- tu normalne działanie jak container istnieje
         local diamondCount = getAmount("Seed", "Diamond")
         local instaCount = getAmount("Misc", "Insta Plant Capsule")
 
-        if diamondCount >= 10 and instaCount >= 10 then
+        if diamondCount >= 10 and instaCount >= 10 and container then
             for i = 1, 10 do
                 local args = {"FlowerGarden", "PlantSeed", i, "Diamond"}
                 game:GetService("ReplicatedStorage").Network.Instancing_InvokeCustomFromClient:InvokeServer(unpack(args))
@@ -218,8 +208,6 @@ task.wait()
                 local args = {"FlowerGarden", "ClaimPlant", i}
                 game:GetService("ReplicatedStorage").Network.Instancing_FireCustomFromClient:FireServer(unpack(args))
             end
-        else
-            task.wait()
         end
     end
 end
@@ -231,23 +219,12 @@ local GardenCycleToggle = GardenTab:CreateToggle({
     Callback = function(Value)
         gardenCycleEnabled = Value
         if gardenCycleEnabled then
-            local container = workspace.__THINGS.__INSTANCE_CONTAINER.Active:FindFirstChild("FlowerGarden")
-            if game.PlaceId == 8737899170 and container then
-                -- start nowego taska
+            if game.PlaceId == 8737899170 then
                 task.spawn(gardenCycle)
-            else
-                Rayfield:Notify({
-                    Title = "Auto Garden",
-                    Content = (container and "You are not in Spawn World!" or "Garden not active!"),
-                    Duration = 4,
-                    Image = 4483362458,
-                })
-                gardenCycleEnabled = false
             end
         end
     end
 })
-
 
 local SeedBagEnabled = false
 local SeedBagToggle = GardenTab:CreateToggle({
