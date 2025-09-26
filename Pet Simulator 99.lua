@@ -184,7 +184,9 @@ end
 
 local function gardenCycle()
     while gardenCycleEnabled do
-        local container = workspace.__THINGS.__INSTANCE_CONTAINER.Active:FindFirstChild("FlowerGarden")
+        local container = workspace:FindFirstChild("__THINGS")
+            and workspace.__THINGS:FindFirstChild("__INSTANCE_CONTAINER")
+            and workspace.__THINGS.__INSTANCE_CONTAINER.Active:FindFirstChild("FlowerGarden")
 
         if not gardenCycleEnabled then
             break
@@ -194,21 +196,28 @@ local function gardenCycle()
         local instaCount = getAmount("Misc", "Insta Plant Capsule")
 
         if diamondCount >= 10 and instaCount >= 10 and container then
+    
             for i = 1, 10 do
                 local args = {"FlowerGarden", "PlantSeed", i, "Diamond"}
-                game:GetService("ReplicatedStorage").Network.Instancing_InvokeCustomFromClient:InvokeServer(unpack(args))
+                game.ReplicatedStorage.Network.Instancing_InvokeCustomFromClient:InvokeServer(unpack(args))
             end
-task.wait()
+
+            task.wait()
+
             for i = 1, 10 do
                 local args = {"FlowerGarden", "InstaGrowSeed", i}
-                game:GetService("ReplicatedStorage").Network.Instancing_InvokeCustomFromClient:InvokeServer(unpack(args))
+                game.ReplicatedStorage.Network.Instancing_InvokeCustomFromClient:InvokeServer(unpack(args))
             end
-task.wait()
+
+            task.wait()
+
             for i = 1, 10 do
                 local args = {"FlowerGarden", "ClaimPlant", i}
-                game:GetService("ReplicatedStorage").Network.Instancing_FireCustomFromClient:FireServer(unpack(args))
+                game.ReplicatedStorage.Network.Instancing_FireCustomFromClient:FireServer(unpack(args))
             end
         end
+
+        task.wait()
     end
 end
 
@@ -218,10 +227,8 @@ local GardenCycleToggle = GardenTab:CreateToggle({
     Flag = "GardenCycleToggle",
     Callback = function(Value)
         gardenCycleEnabled = Value
-        if gardenCycleEnabled then
-            if game.PlaceId == 8737899170 then
-                task.spawn(gardenCycle)
-            end
+        if gardenCycleEnabled and game.PlaceId == 8737899170 then
+            task.spawn(gardenCycle)
         end
     end
 })
