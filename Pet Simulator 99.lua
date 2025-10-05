@@ -572,7 +572,7 @@ MinigamesTab:CreateToggle({
                             Random.new():NextNumber(-4.75, 4.75)
                         )
                     else
-                        castVector = Vector3.new(1468, 61, -1450)
+                        castVector = Vector3.new(1459.0086669921875, 61.62493896484375, -4451.37548828125)
                     end
 
                     -- 🎣 Rzut wędką
