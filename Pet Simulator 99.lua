@@ -551,92 +551,84 @@ MinigamesTab:CreateToggle({
 
         if not advancedFishingEnabled then return end
 
-        if game.PlaceId ~= 8737899170 then
-            Rayfield:Notify({
-                Title = "Auto Advanced Fishing",
-                Content = "You are not in Spawn World!",
-                Duration = 3,
-                Image = 4483362458,
-            })
-            return
-        end
-
-        local ReplicatedStorage = game:GetService("ReplicatedStorage")
-        local Workspace = game:GetService("Workspace")
-        local Network = ReplicatedStorage:WaitForChild("Network")
-
-        if not Workspace.__THINGS.__INSTANCE_CONTAINER.Active:FindFirstChild("AdvancedFishing") then
-            game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart").CFrame =
-                Workspace.__THINGS.Instances.AdvancedFishing.Teleports.Enter.CFrame
-
-            repeat task.wait() until Workspace.__THINGS.__INSTANCE_CONTAINER.Active:FindFirstChild("AdvancedFishing") or not advancedFishingEnabled
-        end
-
-        if advancedFishingEnabled then
-            repeat task.wait() until Workspace.__THINGS.__INSTANCE_CONTAINER.Active.AdvancedFishing:FindFirstChild("Interactable")
-                and #Workspace.__THINGS.__INSTANCE_CONTAINER.Active.AdvancedFishing.Interactable:GetChildren() > 0
-        end
-
         task.spawn(function()
+            local ReplicatedStorage = game:GetService("ReplicatedStorage")
+            local Workspace = game:GetService("Workspace")
+            local Network = ReplicatedStorage:WaitForChild("Network")
+            local Player = game.Players.LocalPlayer
+
             while advancedFishingEnabled do
-                local deepPool = nil
-                for _, instance in pairs(Workspace.__THINGS.__INSTANCE_CONTAINER.Active.AdvancedFishing.Interactable:GetChildren()) do
-                    if instance.Name == "DeepPool" then
-                        deepPool = instance
-                        break
+                local container = Workspace.__THINGS.__INSTANCE_CONTAINER.Active:FindFirstChild("AdvancedFishing")
+
+                if container then
+                    local interactable = container:FindFirstChild("Interactable")
+                    local deepPool = interactable and interactable:FindFirstChild("DeepPool")
+
+                    -- 📍 wybór pozycji rzutu (DeepPool lub obok gracza)
+                    local castVector
+                    if deepPool then
+                        castVector = deepPool.Position + Vector3.new(
+                            Random.new():NextNumber(-4.75, 4.75),
+                            0,
+                            Random.new():NextNumber(-4.75, 4.75)
+                        )
+                    else
+                        castVector = Player.Character.HumanoidRootPart.Position + Vector3.new(0, 0, -3)
                     end
-                end
 
-                -- Wybierz losową pozycję w DeepPool lub użyj sztywnej pozycji
-                local castVector
-                if deepPool then
-                    castVector = deepPool.Position + Vector3.new(Random.new():NextNumber(-4.75, 4.75), 0, Random.new():NextNumber(-4.75, 4.75))
-                else
-                    castVector = Vector3.new(1468.106, 61.625, -4449.908)
-                end
+                    -- 🎣 Rzut wędką
+                    Network.Instancing_FireCustomFromClient:FireServer("AdvancedFishing", "RequestCast", castVector)
 
-                Network.Instancing_FireCustomFromClient:FireServer("AdvancedFishing", "RequestCast", castVector)
+                    -- 🔍 Szukanie bobbera
+                    local bobbers = container:FindFirstChild("Bobbers")
+                    local playerBobber
 
-                local bobbers = Workspace.__THINGS.__INSTANCE_CONTAINER.Active.AdvancedFishing.Bobbers
-                local playerBobber
-
-                repeat
-                    for _, v in pairs(bobbers:GetChildren()) do
-                        if v:FindFirstChild("Bobber") and (v.Bobber.Position - castVector).Magnitude < 3 then
-                            playerBobber = v.Bobber
-                            break
+                    repeat
+                        for _, v in pairs(bobbers:GetChildren()) do
+                            if v:FindFirstChild("Bobber") and (v.Bobber.Position - castVector).Magnitude < 3 then
+                                playerBobber = v.Bobber
+                                break
+                            end
                         end
+                        task.wait()
+                    until not advancedFishingEnabled or playerBobber
+
+                    if not playerBobber then
+                        task.wait(1)
+                        continue
                     end
-                    task.wait()
-                until not advancedFishingEnabled or playerBobber
 
-                if not advancedFishingEnabled or not playerBobber then continue end
+                    -- ⏳ Czekanie aż bobber spadnie do wody
+                    local previousY
+                    repeat
+                        local y = playerBobber.Position.Y
+                        if previousY == y then break end
+                        previousY = y
+                        task.wait()
+                    until not advancedFishingEnabled
 
-                local previousY
-                repeat
-                    local y = playerBobber.Position.Y
-                    if previousY == y then break end
-                    previousY = y
-                    task.wait()
-                until not advancedFishingEnabled
+                    local fallY = playerBobber.Position.Y
+                    repeat task.wait() until not advancedFishingEnabled or playerBobber.Position.Y < fallY
 
-                local fallY = playerBobber.Position.Y
-                repeat task.wait() until not advancedFishingEnabled or playerBobber.Position.Y < fallY
-                Network.Instancing_FireCustomFromClient:FireServer("AdvancedFishing", "RequestReel")
+                    -- 🧲 Zwijanie wędki
+                    Network.Instancing_FireCustomFromClient:FireServer("AdvancedFishing", "RequestReel")
 
-                while game.Players.LocalPlayer.Character:FindFirstChild("Model")
-                    and game.Players.LocalPlayer.Character.Model:FindFirstChild("Rod")
-                    and game.Players.LocalPlayer.Character.Model.Rod:FindFirstChild("FishingLine")
-                    and advancedFishingEnabled do
+                    -- 🎯 Klikanie w minigrze
+                    while Player.Character:FindFirstChild("Model")
+                        and Player.Character.Model:FindFirstChild("Rod")
+                        and Player.Character.Model.Rod:FindFirstChild("FishingLine")
+                        and advancedFishingEnabled do
 
-                    Network.Instancing_InvokeCustomFromClient:InvokeServer("AdvancedFishing", "Clicked")
-                    task.wait(0.75)
+                        Network.Instancing_InvokeCustomFromClient:InvokeServer("AdvancedFishing", "Clicked")
+                        task.wait(0.75)
+                    end
                 end
 
+                -- 🕐 czeka sekundę przed kolejnym sprawdzeniem czy instancja istnieje
                 task.wait(1)
             end
         end)
-    end,
+    end
 })
 
 local autoDigsite = false
