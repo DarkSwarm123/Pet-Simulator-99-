@@ -564,7 +564,6 @@ MinigamesTab:CreateToggle({
                     local interactable = container:FindFirstChild("Interactable")
                     local deepPool = interactable and interactable:FindFirstChild("DeepPool")
 
-                    -- 📍 wybór pozycji rzutu (DeepPool lub obok gracza)
                     local castVector
                     if deepPool then
                         castVector = deepPool.Position + Vector3.new(
@@ -573,7 +572,7 @@ MinigamesTab:CreateToggle({
                             Random.new():NextNumber(-4.75, 4.75)
                         )
                     else
-                        castVector = Player.Character.HumanoidRootPart.Position + Vector3.new(0, 0, -3)
+                        castVector = Vector3.new(1468, 61, -1450)
                     end
 
                     -- 🎣 Rzut wędką
