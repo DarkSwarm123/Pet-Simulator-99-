@@ -570,7 +570,7 @@ for _, keyData in pairs(Keys) do
         end
     end
 
-    Tab:CreateToggle({
+    MainTab:CreateToggle({
     Name = "Craft " .. keyData.Name .. " Keys",
     CurrentValue = false,
     Flag = "CraftKey_" .. keyData.Name,
