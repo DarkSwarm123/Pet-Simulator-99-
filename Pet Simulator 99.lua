@@ -543,6 +543,8 @@ end)
 
 local Network = game:GetService("ReplicatedStorage"):WaitForChild("Network")
 
+local Section = MainTab:CreateSection("Keys")
+
 local Keys = {
     {Name = "Crystal", Upper = "Crystal Key Upper Half", Lower = "Crystal Key Lower Half"},
     {Name = "Tech", Upper = "Tech Key Upper Half", Lower = "Tech Key Lower Half"},
