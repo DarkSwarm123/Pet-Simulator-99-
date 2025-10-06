@@ -570,16 +570,17 @@ for _, keyData in pairs(Keys) do
         end
     end
 
-    MainTab:CreateToggle({
-        Name = "Craft " .. keyData.Name .. " Keys",
-        CurrentValue = false,
-        Callback = function(value)
-            enabled = value
-            if enabled then
-                task.spawn(CraftKey)
-            end
+    Tab:CreateToggle({
+    Name = "Craft " .. keyData.Name .. " Keys",
+    CurrentValue = false,
+    Flag = "CraftKey_" .. keyData.Name,
+    Callback = function(value)
+        enabled = value
+        if enabled then
+            task.spawn(CraftKey)
         end
-    })
+    end
+})
 end
 
 local advancedFishingEnabled = false
