@@ -493,7 +493,7 @@ local DaycareToggle = MainTab:CreateToggle({
 local autoFuseEnabled = false 
 
 local FuseToggle = MainTab:CreateToggle({
-    Name = "Enable Auto Fuse",
+    Name = "Auto Fuse",
     CurrentValue = false,
     Flag = "AutoFuseToggle",
     Callback = function(Value)
@@ -540,6 +540,45 @@ task.spawn(function()
         task.wait(2)
     end
 end)
+
+local Network = game:GetService("ReplicatedStorage"):WaitForChild("Network")
+
+local Keys = {
+    {Name = "Crystal", Upper = "Crystal Key Upper Half", Lower = "Crystal Key Lower Half"},
+    {Name = "Tech", Upper = "Tech Key Upper Half", Lower = "Tech Key Lower Half"},
+    {Name = "Secret", Upper = "Secret Key Upper Half", Lower = "Secret Key Lower Half"},
+    {Name = "Void", Upper = "Void Key Upper Half", Lower = "Void Key Lower Half"},
+    {Name = "Fantasy", Upper = "Fantasy Key Upper Half", Lower = "Fantasy Key Lower Half"},
+}
+
+for _, keyData in pairs(Keys) do
+    local enabled = false
+
+    local function CraftKey()
+        while enabled do
+            local part1 = getAmount("Misc", keyData.Upper)
+            local part2 = getAmount("Misc", keyData.Lower)
+
+            if part1 > 0 and part2 > 0 then
+                local amount = math.min(part1, part2)
+                Network[keyData.Name .. "Key_Combine"]:InvokeServer(amount)
+            end
+
+            task.wait(1)
+        end
+    end
+
+    Tab:CreateToggle({
+        Name = "Craft " .. keyData.Name .. " Keys",
+        CurrentValue = false,
+        Callback = function(value)
+            enabled = value
+            if enabled then
+                task.spawn(CraftKey)
+            end
+        end
+    })
+end
 
 local advancedFishingEnabled = false
 
