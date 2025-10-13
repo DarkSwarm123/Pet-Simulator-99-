@@ -168,6 +168,40 @@ OtherTab:CreateToggle({
     end,
 })
 
+local AutoBreak = false
+MainTab:CreateToggle({
+    Name = "Auto Break (Sequential)",
+    CurrentValue = false,
+    Flag = "AutoBreakToggle",
+    Callback = function(Value)
+        AutoBreak = Value
+        if Value then
+            task.spawn(function()
+                local Workspace = game:GetService("Workspace")
+                local ReplicatedStorage = game:GetService("ReplicatedStorage")
+                local Network = ReplicatedStorage:WaitForChild("Network")
+                local Breakables = Workspace.__THINGS:WaitForChild("Breakables")
+                local MapCmds = require(ReplicatedStorage.Library.Client.MapCmds)
+
+                while AutoBreak do
+                    local zone = MapCmds.GetCurrentZone()
+                    for _, b in pairs(Breakables:GetChildren()) do
+                        if not AutoBreak then break end
+                        if b:IsA("Model") and b:GetAttribute("ParentID") == zone then
+                            repeat
+                                if not AutoBreak then break end
+                                Network.Breakables_PlayerDealDamage:FireServer(b.Name)
+                                task.wait(.75)
+                            until not b.Parent
+                        end
+                    end
+                    task.wait()
+                end
+            end)
+        end
+    end
+})
+
 local Save = require(game:GetService("ReplicatedStorage"):WaitForChild("Library"):WaitForChild("Client"):WaitForChild("Save"))
 
 local gardenCycleEnabled = false
