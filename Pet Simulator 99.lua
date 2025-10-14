@@ -170,7 +170,7 @@ OtherTab:CreateToggle({
 
 local AutoBreak = false
 MainTab:CreateToggle({
-    Name = "Auto Break (Sequential)",
+    Name = "Auto Tap Breakables",
     CurrentValue = false,
     Flag = "AutoBreakToggle",
     Callback = function(Value)
@@ -191,7 +191,7 @@ MainTab:CreateToggle({
                             repeat
                                 if not AutoBreak then break end
                                 Network.Breakables_PlayerDealDamage:FireServer(b.Name)
-                                task.wait(.75)
+                                task.wait(.5)
                             until not b.Parent
                         end
                     end
