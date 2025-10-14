@@ -790,8 +790,11 @@ local RemoteSpyButton = OtherTab:CreateButton({
     end
 })
 
-local scriptPath = game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.Core["Idle Tracking"]
-scriptPath.Enabled = false
+game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.Game["Giftbags Frontend"].Enabled = false
+
+game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.Game.Breakables["Breakables Frontend"].Enabled = false
+
+game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.Core["Idle Tracking"].Enabled = false
 
 game:GetService("Players").LocalPlayer.Idled:Connect(function()
     local VIM = game:GetService("VirtualInputManager")
