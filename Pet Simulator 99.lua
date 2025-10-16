@@ -41,6 +41,84 @@ local ItemsTab = Window:CreateTab("Items", 4483362458)
 local GardenTab = Window:CreateTab("Garden", 15555104643)
 local MinigamesTab = Window:CreateTab("Minigames", 4483362458)
 
+local NotificationCmds = require(game.ReplicatedStorage.Library.Client.NotificationCmds)
+
+local HatchingCmds = require(game.ReplicatedStorage.Library.Client.HatchingCmds)
+
+local EggCmds = require(game.ReplicatedStorage.Library.Client.EggCmds)
+ game:GetService("Players").Players.LocalPlayer.PlayerScripts.Scripts.Game["Egg Opening Frontend"].Enabled = false
+
+local starthatch = false
+
+MainTab:CreateToggle({
+    Name = "Auto Hatch Best Egg",
+    CurrentValue = false,
+    Flag = "AutoHatchBestEgg",
+    Callback = function(Value)
+        local Players = game:GetService("Players")
+        local LocalPlayer = Players.LocalPlayer
+
+        if Value then
+            task.spawn(function()
+                local dir = game:GetService("ReplicatedStorage").__DIRECTORY.Eggs["Zone Eggs"]
+
+                local worldNum = nil
+                for _, child in pairs(workspace.__THINGS.ZoneEggs:GetChildren()) do
+                    if child.Name:match("World%d") then
+                        worldNum = child.Name:match("World(%d)")
+                        break
+                    end
+                end
+                if not worldNum then return end
+
+                local world = dir:FindFirstChild("World "..worldNum)
+                local zoneEggs = workspace.__THINGS.ZoneEggs:FindFirstChild("World"..worldNum)
+                if not world or not zoneEggs then return end
+
+                -- Znajdź najlepsze jajko
+                local highestNum = -1
+                local bestEggName = nil
+                for _, folder in pairs(world:GetDescendants()) do
+                    local num = tonumber(folder.Name:match("(%d+)%s*|"))
+                    local eggName = folder.Name:match("|%s*(.+)")
+                    if num and eggName and num > highestNum then
+                        highestNum = num
+                        bestEggName = eggName
+                    end
+                end
+                local bestCapsule = zoneEggs:FindFirstChild(tostring(highestNum).." - Egg Capsule")
+                if not bestCapsule or not bestEggName then return end
+
+                -- Auto Hatch loop
+                while Value do
+                    task.wait(EggCmds.ComputeDebounce())
+                    local HRP = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+                    if not HRP then continue end
+
+                    local eggPos = bestCapsule:GetPivot().Position
+                    local distance = (HRP.Position - eggPos).Magnitude
+
+                    if distance <= 40 then
+                        local success, result = EggCmds.RequestPurchase(bestEggName, EggCmds.GetMaxHatch())
+                        if not success then
+                            NotificationCmds.Message.Bottom({
+                                Message = "❌ Purchase failed: "..tostring(result),
+                                Color = Color3.fromRGB(255,0,0)
+                            })
+                        end
+                    else
+                        NotificationCmds.Message.Bottom({
+                            Message = "⚠️ Za daleko od jajka ("..math.floor(distance).." studs), czekam...",
+                            Color = Color3.fromRGB(255,255,0)
+                        })
+                        task.wait(1)
+                    end
+                end
+            end)
+        end
+    end
+})
+
 local orb = require(game:GetService("ReplicatedStorage").Library.Client.OrbCmds.Orb)
 orb.DefaultPickupDistance = math.huge
 orb.CollectDistance = math.huge
