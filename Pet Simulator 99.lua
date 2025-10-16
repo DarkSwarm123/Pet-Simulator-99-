@@ -42,11 +42,10 @@ local GardenTab = Window:CreateTab("Garden", 15555104643)
 local MinigamesTab = Window:CreateTab("Minigames", 4483362458)
 
 local NotificationCmds = require(game.ReplicatedStorage.Library.Client.NotificationCmds)
-
 local HatchingCmds = require(game.ReplicatedStorage.Library.Client.HatchingCmds)
-
 local EggCmds = require(game.ReplicatedStorage.Library.Client.EggCmds)
- game:GetService("Players").Players.LocalPlayer.PlayerScripts.Scripts.Game["Egg Opening Frontend"].Enabled = false
+
+game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.Game["Egg Opening Frontend"].Enabled = false
 
 local starthatch = false
 
@@ -55,14 +54,19 @@ MainTab:CreateToggle({
     CurrentValue = false,
     Flag = "AutoHatchBestEgg",
     Callback = function(Value)
-        local Players = game:GetService("Players")
-        local LocalPlayer = Players.LocalPlayer
+        starthatch = Value
 
-        if Value then
+        if starthatch then
             task.spawn(function()
-                local dir = game:GetService("ReplicatedStorage").__DIRECTORY.Eggs["Zone Eggs"]
+                local Players = game:GetService("Players")
+                local LocalPlayer = Players.LocalPlayer
 
-                local worldNum = nil
+                local function getHRP()
+                    return LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+                end
+
+                local dir = game:GetService("ReplicatedStorage").__DIRECTORY.Eggs["Zone Eggs"]
+                local worldNum
                 for _, child in pairs(workspace.__THINGS.ZoneEggs:GetChildren()) do
                     if child.Name:match("World%d") then
                         worldNum = child.Name:match("World(%d)")
@@ -77,7 +81,7 @@ MainTab:CreateToggle({
 
                 -- Znajdź najlepsze jajko
                 local highestNum = -1
-                local bestEggName = nil
+                local bestEggName
                 for _, folder in pairs(world:GetDescendants()) do
                     local num = tonumber(folder.Name:match("(%d+)%s*|"))
                     local eggName = folder.Name:match("|%s*(.+)")
@@ -86,13 +90,14 @@ MainTab:CreateToggle({
                         bestEggName = eggName
                     end
                 end
+
                 local bestCapsule = zoneEggs:FindFirstChild(tostring(highestNum).." - Egg Capsule")
                 if not bestCapsule or not bestEggName then return end
 
-                -- Auto Hatch loop
-                while Value do
+                -- Główna pętla kontrolowana przez toggle
+                while starthatch do
                     task.wait(EggCmds.ComputeDebounce())
-                    local HRP = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+                    local HRP = getHRP()
                     if not HRP then continue end
 
                     local eggPos = bestCapsule:GetPivot().Position
@@ -107,10 +112,6 @@ MainTab:CreateToggle({
                             })
                         end
                     else
-                        NotificationCmds.Message.Bottom({
-                            Message = "⚠️ Za daleko od jajka ("..math.floor(distance).." studs), czekam...",
-                            Color = Color3.fromRGB(255,255,0)
-                        })
                         task.wait(1)
                     end
                 end
