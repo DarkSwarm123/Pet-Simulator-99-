@@ -168,8 +168,117 @@ OtherTab:CreateToggle({
     end,
 })
 
-local AutoBreak = false
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+ LocalPlayer.PlayerScripts.Scripts.Game["Egg Opening Frontend"].Enabled = false
+
+local NotificationCmds = require(game.ReplicatedStorage.Library.Client.NotificationCmds)
+
+local EggCmds = require(game.ReplicatedStorage.Library.Client.EggCmds)
+
+local dir = game:GetService("ReplicatedStorage").__DIRECTORY.Eggs["Zone Eggs"]
+
+-- Znajdź najwyższy numer świata w katalogu
+local highestWorldNum = -1
+local highestWorldFolder = nil
+for _, worldFolder in pairs(dir:GetChildren()) do
+    local num = tonumber(worldFolder.Name:match("%d+"))
+    if num and num > highestWorldNum then
+        highestWorldNum = num
+        highestWorldFolder = worldFolder
+    end
+end
+
+if not highestWorldFolder then
+    warn("Nie znaleziono żadnego świata!")
+    return
+end
+
+local world = highestWorldFolder
+local zoneEggs = workspace.__THINGS.ZoneEggs:FindFirstChild(world.Name)
+
+if not zoneEggs then
+    warn("Nie znaleziono ZoneEggs dla świata " .. world.Name)
+    return
+end
+
 MainTab:CreateToggle({
+    Name = "Auto Hatch Best Egg",
+    CurrentValue = false,
+    Flag = "AutoHatchBest",
+    Callback = function(enabled)
+        task.spawn(function()
+            local autoHatch = enabled
+            local starthatch = false
+            local highestNum, bestEggName, bestCapsule
+
+            -- Znajdź najlepsze jajko raz na start
+            if world and zoneEggs then
+                highestNum = -1
+                for _, folder in pairs(world:GetDescendants()) do
+                    local num = tonumber(folder.Name:match("(%d+)%s*|"))
+                    local eggName = folder.Name:match("|%s*(.+)")
+                    if num and eggName and num > highestNum then
+                        highestNum = num
+                        bestEggName = eggName
+                    end
+                end
+                bestCapsule = zoneEggs:FindFirstChild(tostring(highestNum).." - Egg Capsule")
+            end
+
+            if not bestCapsule or not bestEggName then
+                NotificationCmds.Message.Bottom({
+                    Message = "⚠️ Nie znaleziono jajka w workspace!",
+                    Color = Color3.fromRGB(255, 255, 0)
+                })
+                return
+            end
+
+            local HRP = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+            while autoHatch do
+                if not HRP then
+                    task.wait(0.5)
+                    HRP = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+                    continue
+                end
+
+                local distance = (HRP.Position - bestCapsule:GetPivot().Position).Magnitude
+
+                if distance <= 40 then
+                    if not starthatch then
+                        starthatch = true
+                        NotificationCmds.Message.Bottom({
+                            Message = "🟢 Auto Hatch wznowione",
+                            Color = Color3.fromRGB(0, 255, 0)
+                        })
+                    end
+
+                    -- Wywołanie hatch
+                    local success, result = EggCmds.RequestPurchase(bestEggName, EggCmds.GetMaxHatch())
+                    if not success then
+                        NotificationCmds.Message.Bottom({
+                            Message = "❌ Purchase failed: "..tostring(result),
+                            Color = Color3.fromRGB(255, 0, 0)
+                        })
+                    end
+                else
+                    if starthatch then
+                        starthatch = false
+                        NotificationCmds.Message.Bottom({
+                            Message = "⚠️ Za daleko od jajka ("..math.floor(distance).." studs), Auto Hatch wstrzymany",
+                            Color = Color3.fromRGB(255, 255, 0)
+                        })
+                    end
+                end
+
+                task.wait(EggCmds.ComputeDebounce())
+            end
+        end)
+    end
+})
+
+local AutoBreak = false
+OtherTab:CreateToggle({
     Name = "Auto Tap Breakables",
     CurrentValue = false,
     Flag = "AutoBreakToggle",
