@@ -202,17 +202,18 @@ if not zoneEggs then
     return
 end
 
-MainTab:CreateToggle({
+local starthatch = false
+local autohatch = false
+
+local BestHatchToggle = MainTab:CreateToggle({
     Name = "Auto Hatch Best Egg",
     CurrentValue = false,
     Flag = "AutoHatchBest",
-    Callback = function(enabled)
+    Callback = function(Value)
         task.spawn(function()
-            local autoHatch = enabled
-            local starthatch = false
+            autohatch = Value
             local highestNum, bestEggName, bestCapsule
 
-            -- Znajdź najlepsze jajko raz na start
             if world and zoneEggs then
                 highestNum = -1
                 for _, folder in pairs(world:GetDescendants()) do
@@ -235,7 +236,7 @@ MainTab:CreateToggle({
             end
 
             local HRP = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-            while autoHatch do
+            while autohatch do
                 if not HRP then
                     task.wait(0.5)
                     HRP = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
@@ -278,7 +279,8 @@ MainTab:CreateToggle({
 })
 
 local AutoBreak = false
-OtherTab:CreateToggle({
+
+local AutoTapToggle = OtherTab:CreateToggle({
     Name = "Auto Tap Breakables",
     CurrentValue = false,
     Flag = "AutoBreakToggle",
