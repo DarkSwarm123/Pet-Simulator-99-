@@ -49,6 +49,18 @@ orb.CombineDelay = 0
 orb.SoundDistance = 0
 orb.BillboardDistance = 0
 
+local rs = game:GetService("RunService")
+local orbsFolder = workspace.__THINGS.Orbs
+
+orbsFolder.ChildAdded:Connect(function(orb)
+    rs:BindToRenderStep("RemoveOrb_" .. orb:GetDebugId(), Enum.RenderPriority.Last.Value, function()
+        if orb and orb.Parent then
+            orb:Destroy()
+        end
+        rs:UnbindFromRenderStep("RemoveOrb_" .. orb:GetDebugId())
+    end)
+end)
+
 local starthatch = false
 
 local function Hatch()
