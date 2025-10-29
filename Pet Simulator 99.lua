@@ -54,10 +54,7 @@ local orbsFolder = workspace.__THINGS.Orbs
 
 orbsFolder.ChildAdded:Connect(function(orb)
     rs:BindToRenderStep("RemoveOrb_" .. orb:GetDebugId(), Enum.RenderPriority.Last.Value, function()
-        if orb and orb.Parent then
-            orb:Destroy()
-        end
-        rs:UnbindFromRenderStep("RemoveOrb_" .. orb:GetDebugId())
+                rs:UnbindFromRenderStep("RemoveOrb_" .. orb:GetDebugId())
     end)
 end)
 
