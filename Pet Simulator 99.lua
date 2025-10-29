@@ -52,22 +52,12 @@ orb.BillboardDistance = 0
 local rs = game:GetService("RunService")
 local orbsFolder = workspace.__THINGS.Orbs
 
-local function hideOrb(orb)
-    if orb and orb.Parent then
-        for _, part in pairs(orb:GetDescendants()) do
-            if part:IsA("BasePart") or part:IsA("MeshPart") then
-                part.Transparency = 1
-                part.Reflectance = 0
-                part.CanCollide = false
-            end
-        end
-    end
-end
-
 orbsFolder.ChildAdded:Connect(function(orb)
-    rs:BindToRenderStep("HideOrb_" .. orb:GetDebugId(), Enum.RenderPriority.Last.Value, function()
-        hideOrb(orb)
-        rs:UnbindFromRenderStep("HideOrb_" .. orb:GetDebugId())
+    rs:BindToRenderStep("RemoveOrb_" .. orb:GetDebugId(), Enum.RenderPriority.Last.Value, function()
+        if orb and orb.Parent then
+            orb:Destroy()
+        end
+        rs:UnbindFromRenderStep("RemoveOrb_" .. orb:GetDebugId())
     end)
 end)
 
