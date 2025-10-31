@@ -324,7 +324,7 @@ local AutoTapToggle = OtherTab:CreateToggle({
                             repeat
                                 if not AutoBreak then break end
                                 Network.Breakables_PlayerDealDamage:FireServer(b.Name)
-                                task.wait(.5)
+                                task.wait(.2)
                             until not b.Parent
                         end
                     end
