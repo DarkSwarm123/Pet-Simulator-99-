@@ -61,112 +61,111 @@ orbsFolder.ChildAdded:Connect(function(orb)
     end)
 end)
 
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+local NotificationCmds = require(ReplicatedStorage.Library.Client.NotificationCmds)
+local HatchingCmds = require(ReplicatedStorage.Library.Client.HatchingCmds)
+local EggCmds = require(ReplicatedStorage.Library.Client.EggCmds)
+
 local starthatch = false
 
 local function Hatch()
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
-local HRP = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+    local HRP = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+    LocalPlayer.PlayerScripts.Scripts.Game["Egg Opening Frontend"].Enabled = false
 
-local NotificationCmds = require(game.ReplicatedStorage.Library.Client.NotificationCmds)
-local HatchingCmds = require(game.ReplicatedStorage.Library.Client.HatchingCmds)
-local EggCmds = require(game.ReplicatedStorage.Library.Client.EggCmds)
+    local zoneEggsFolder = workspace.__THINGS.ZoneEggs
+    local highestWorldNum, highestWorldFolder = -1, nil
 
-LocalPlayer.PlayerScripts.Scripts.Game["Egg Opening Frontend"].Enabled = false
+    -- 🗺️ Znajdź najwyższy dostępny świat
+    for _, folder in ipairs(zoneEggsFolder:GetChildren()) do
+        local num = tonumber(folder.Name:match("World(%d+)"))
+        if num and num > highestWorldNum then
+            highestWorldNum = num
+            highestWorldFolder = folder
+        end
+    end
 
-local zoneEggsFolder = workspace.__THINGS.ZoneEggs
-local highestWorldNum = -1
-local highestWorldName = nil
+    if not highestWorldFolder then
+        NotificationCmds.Message.Bottom({
+            Message = "❌ Nie znaleziono świata!",
+            Color = Color3.fromRGB(255, 0, 0)
+        })
+        return
+    end
 
-for _, folder in pairs(zoneEggsFolder:GetChildren()) do
-	local num = tonumber(folder.Name:match("World(%d+)"))
-	if num and num > highestWorldNum then
-		highestWorldNum = num
-		highestWorldName = folder.Name
-	end
-end
+    -- 📦 Pobierz dane o jajkach
+    local dirWorld = ReplicatedStorage.__DIRECTORY.Eggs["Zone Eggs"]:FindFirstChild("World " .. highestWorldNum)
+    if not dirWorld then
+        NotificationCmds.Message.Bottom({
+            Message = "❌ Brak danych świata " .. highestWorldNum,
+            Color = Color3.fromRGB(255, 0, 0)
+        })
+        return
+    end
 
-if not highestWorldName then
-	NotificationCmds.Message.Bottom({
-		Message = "❌ Nie znaleziono świata!",
-		Color = Color3.fromRGB(255, 0, 0)
-	})
-	return
-end
+    -- 🔍 Znajdź najlepsze jajko po numerze
+    local allCapsules = highestWorldFolder:GetChildren()
+    table.sort(allCapsules, function(a, b)
+        return tonumber(a.Name:match("^(%d+)")) < tonumber(b.Name:match("^(%d+)"))
+    end)
 
-local dir = game:GetService("ReplicatedStorage").__DIRECTORY.Eggs["Zone Eggs"]
-local dirWorld = dir:FindFirstChild("World " .. highestWorldNum)
-local wsWorld = zoneEggsFolder:FindFirstChild("World" .. highestWorldNum)
+    local bestCapsule = allCapsules[#allCapsules]
+    if not bestCapsule then
+        NotificationCmds.Message.Bottom({
+            Message = "⚠️ Nie znaleziono żadnego jajka!",
+            Color = Color3.fromRGB(255, 255, 0)
+        })
+        return
+    end
 
-if not dirWorld or not wsWorld then
-	NotificationCmds.Message.Bottom({
-		Message = "❌ Nie znaleziono danych świata " .. tostring(highestWorldNum),
-		Color = Color3.fromRGB(255, 0, 0)
-	})
-	return
-end
+    local num = bestCapsule.Name:match("^(%d+)")
+    local bestEggName
+    for _, folder in ipairs(dirWorld:GetDescendants()) do
+        if folder.Name:match("^" .. num .. "%s*|") then
+            bestEggName = folder.Name:match("|%s*(.+)")
+            break
+        end
+    end
 
-local allCapsules = wsWorld:GetChildren()
-table.sort(allCapsules, function(a, b)
-	return tonumber(a.Name:match("^(%d+)")) < tonumber(b.Name:match("^(%d+)"))
-end)
+    if not bestEggName then
+        NotificationCmds.Message.Bottom({
+            Message = "⚠️ Nie znaleziono najlepszego jajka w katalogu!",
+            Color = Color3.fromRGB(255, 255, 0)
+        })
+        return
+    end
 
-local bestCapsule = allCapsules[#allCapsules]
-local bestEggName = nil
+    NotificationCmds.Message.Bottom({
+        Message = string.format("🥚 Najlepsze jajko: %s\n🌍 Świat: World %d", bestEggName, highestWorldNum),
+        Color = Color3.fromRGB(0, 255, 0)
+    })
 
-if bestCapsule then
-	local num = bestCapsule.Name:match("^(%d+)")
-	for _, folder in pairs(dirWorld:GetDescendants()) do
-		if folder.Name:match("^" .. num .. "%s*|") then
-			bestEggName = folder.Name:match("|%s*(.+)")
-			break
-		end
-	end
-end
+    while starthatch do
+        task.wait(EggCmds.ComputeDebounce())
+        pcall(function()
+            HRP = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+            if not HRP or not bestCapsule then return end
 
-if not bestCapsule or not bestEggName then
-	NotificationCmds.Message.Bottom({
-		Message = "⚠️ Nie znaleziono najlepszego jajka!",
-		Color = Color3.fromRGB(255, 255, 0)
-	})
-	return
-end
+            local distance = (HRP.Position - bestCapsule:GetPivot().Position).Magnitude
+            if distance > 40 then
+                NotificationCmds.Message.Bottom({
+                    Message = "🐣 Podejdź bliżej jajka!",
+                    Color = Color3.fromRGB(255, 255, 0)
+                })
+                return
+            end
 
-NotificationCmds.Message.Bottom({
-	Message = "🥚 Najlepsze jajko: " .. bestEggName .. "\n🌍 Świat: " .. highestWorldName,
-	Color = Color3.fromRGB(0, 255, 0)
-})
-
-local waitTimer = 0
-
-while task.wait(EggCmds.ComputeDebounce()) and starthatch do
-	pcall(function()
-		HRP = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-		if not HRP then return end
-
-		local distance = (HRP.Position - bestCapsule:GetPivot().Position).Magnitude
-
-		if distance <= 40 then
-			waitTimer = 0
-			local success, result = EggCmds.RequestPurchase(bestEggName, EggCmds.GetMaxHatch())
-			if not success then
-				NotificationCmds.Message.Bottom({
-					Message = "❌ Purchase failed: " .. tostring(result),
-					Color = Color3.fromRGB(255, 0, 0)
-				})
-			end
-		else
-			waitTimer += 1
-			if waitTimer % 5 == 0 then
-				NotificationCmds.Message.Bottom({
-					Message = "🐣 Czekam, aż wrócisz do jajka...",
-					Color = Color3.fromRGB(255, 255, 0)
-				})
-			end
-			task.wait(1)
-		end
-	end)
-end
+            local success, result = EggCmds.RequestPurchase(bestEggName, EggCmds.GetMaxHatch())
+            if not success then
+                NotificationCmds.Message.Bottom({
+                    Message = "❌ Hatch nieudany: " .. tostring(result),
+                    Color = Color3.fromRGB(255, 0, 0)
+                })
+            end
+        end)
+    end
 end
 
 MainTab:CreateToggle({
