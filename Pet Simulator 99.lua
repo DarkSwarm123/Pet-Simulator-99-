@@ -321,7 +321,7 @@ local AutoTapToggle = OtherTab:CreateToggle({
                         if not AutoBreak then break end
                         if b:IsA("Model") and b:GetAttribute("ParentID") == zone and b.Parent then
                             Network.Breakables_PlayerDealDamage:FireServer(b.Name)
-                            task.wait(.2)
+                            task.wait(.7)
                         end
                     end
                     task.wait(1)
