@@ -319,10 +319,9 @@ local AutoTapToggle = OtherTab:CreateToggle({
                     local zone = MapCmds.GetCurrentZone()
                     for _, b in pairs(Breakables:GetChildren()) do
                         if not AutoBreak then break end
-                        if b:IsA("Model") and b:GetAttribute("ParentID") == zone then
-                                if not AutoBreak then break end
-    if b and b.Parent then                            Network.Breakables_PlayerDealDamage:FireServer(b.Name)
-                                task.wait(.5)
+                        if b:IsA("Model") and b:GetAttribute("ParentID") == zone and b.Parent then
+                            Network.Breakables_PlayerDealDamage:FireServer(b.Name)
+                            task.wait(.2)
                         end
                     end
                     task.wait(1)
