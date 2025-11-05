@@ -293,6 +293,38 @@ RunService:BindToRenderStep("HidePetsLoop", Enum.RenderPriority.Camera.Value + 1
 	end
 end)
 
+local BreakablesFolder = workspace.__THINGS.Breakables
+local HiddenBreakables = {}
+local HideBreakablesEnabled = false
+
+OtherTab:CreateToggle({
+	Name = "Hide Breakables",
+	CurrentValue = false,
+	Flag = "HideBreakablesToggle",
+	Callback = function(Value)
+		HideBreakablesEnabled = Value
+		if not HideBreakablesEnabled then
+			for obj, originalParent in pairs(HiddenBreakables) do
+				if obj and not obj.Parent then
+					obj.Parent = originalParent
+				end
+			end
+			table.clear(HiddenBreakables)
+		end
+	end,
+})
+
+RunService:BindToRenderStep("HideBreakablesLoop", Enum.RenderPriority.Last.Value, function()
+	if HideBreakablesEnabled then
+		for _, obj in pairs(BreakablesFolder:GetChildren()) do
+			if not HiddenBreakables[obj] then
+				HiddenBreakables[obj] = obj.Parent
+				obj.Parent = nil
+			end
+		end
+	end
+end)
+
 local AutoBreak = false
 
 local AutoTapToggle = OtherTab:CreateToggle({
