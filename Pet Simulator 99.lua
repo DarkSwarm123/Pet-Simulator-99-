@@ -260,6 +260,39 @@ OtherTab:CreateToggle({
     end,
 })
 
+local RunService = game:GetService("RunService")
+local PetsFolder = workspace.__THINGS.Pets
+local HiddenPets = {}
+local HidePetsEnabled = false
+
+OtherTab:CreateToggle({
+	Name = "Hide Pets",
+	CurrentValue = false,
+	Flag = "HidePetsToggle",
+	Callback = function(Value)
+		HidePetsEnabled = Value
+		if not HidePetsEnabled then
+			for pet, originalParent in pairs(HiddenPets) do
+				if pet and not pet.Parent then
+					pet.Parent = originalParent
+				end
+			end
+			table.clear(HiddenPets)
+		end
+	end,
+})
+
+RunService:BindToRenderStep("HidePetsLoop", Enum.RenderPriority.Camera.Value + 1, function()
+	if HidePetsEnabled then
+		for _, pet in pairs(PetsFolder:GetChildren()) do
+			if not HiddenPets[pet] then
+				HiddenPets[pet] = pet.Parent
+				pet.Parent = nil
+			end
+		end
+	end
+end)
+
 local AutoBreak = false
 
 local AutoTapToggle = OtherTab:CreateToggle({
